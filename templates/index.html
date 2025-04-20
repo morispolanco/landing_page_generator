@@ -6,6 +6,7 @@
     <title>Impulsa Landing - Generador Inteligente</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style> /* Estilos loader AI */ .ai-loader { display: none; margin-left: 10px; font-size: 0.9em; color: var(--primary-color); } .ai-loader i { animation: fa-spin 1.5s infinite linear; } .ai-button { margin-top: 5px; margin-left: 5px; font-size: 0.85em !important; padding: 0.3rem 0.6rem !important; } label + .ai-button { margin-left: 10px; vertical-align: middle; } </style>
 </head>
 <body>
     <div class="container form-container">
@@ -14,141 +15,44 @@
             <p>Rellena los campos para generar tu página de aterrizaje elegante.</p>
         </header>
 
-        <!-- ***** NO enctype needed ***** -->
         <form method="POST" action="/">
 
-            <!-- ... (Fieldsets: Información Básica, Mensaje Principal, Características, Testimonios - SIN CAMBIOS) ... -->
-             <fieldset>
-                <legend><i class="fas fa-info-circle"></i> Información Básica</legend>
-                <div class="form-group">
-                    <label for="page_type">1. Tipo de Página:</label>
-                    <select id="page_type" name="page_type" required>
-                        <option value="personal">👤 Personal (Marca, Portafolio)</option>
-                        <option value="empresarial">🏢 Empresarial (Producto, Servicio, Lead Gen)</option>
-                    </select>
-                </div>
-                <div class="form-group">
-                    <label for="name">2. Nombre (Tu nombre o el de tu empresa):</label>
-                    <input type="text" id="name" name="name" placeholder="Ej: Ana García / Soluciones Tech" required>
-                </div>
-            </fieldset>
+            <!-- ... (Fieldsets: Básico, Mensaje, Características, Testimonios - SIN CAMBIOS) ... -->
+            <fieldset> <legend><i class="fas fa-info-circle"></i> Información Básica</legend> <div class="form-group"> <label for="page_type">1. Tipo de Página:</label> <select id="page_type" name="page_type" required> <option value="personal">👤 Personal</option> <option value="empresarial">🏢 Empresarial</option> </select> </div> <div class="form-group"> <label for="name">2. Nombre:</label> <input type="text" id="name" name="name" placeholder="Ej: Ana García / Soluciones Tech" required> </div> </fieldset>
+            <fieldset> <legend><i class="fas fa-bullhorn"></i> Mensaje Principal</legend> <div class="form-group"> <label for="headline">3. Titular Principal:</label> <input type="text" id="headline" name="headline" placeholder="Ej: Diseño webs que convierten" required maxlength="120"> <small>El gancho principal.</small> </div> <div class="form-group"> <label for="description">4. Descripción:</label> <textarea id="description" name="description" rows="4" placeholder="Explica qué ofreces..."></textarea> </div> <div class="form-group"> <label for="cta_text">5. Texto del Botón (CTA):</label> <input type="text" id="cta_text" name="cta_text" placeholder="Ej: Regístrate Gratis" required> <small>La acción principal.</small> </div> </fieldset>
+            <fieldset> <legend><i class="fas fa-star"></i> Características <span class="optional">(Opcional)</span></legend> <div class="form-group"> <label for="features">6. Lista de Características:</label> <button type="button" class="btn btn-secondary btn-sm ai-button" id="fill-features-ai" title="Rellenar con IA"><i class="fas fa-magic"></i> IA</button> <span class="ai-loader" id="loader-features"><i class="fas fa-spinner"></i></span> <textarea id="features" name="features" rows="5" placeholder="icono:Título:Descripción (uno por línea)"></textarea> <small>Iconos de <a href='https://fontawesome.com/search?m=free&o=r' target='_blank'>Font Awesome</a>.</small> </div> </fieldset>
+            <fieldset> <legend><i class="fas fa-comments"></i> Testimonios <span class="optional">(Opcional)</span></legend> <div class="form-group"> <label for="testimonials">7. Testimonios:</label> <button type="button" class="btn btn-secondary btn-sm ai-button" id="fill-testimonials-ai" title="Rellenar con IA"><i class="fas fa-magic"></i> IA</button> <span class="ai-loader" id="loader-testimonials"><i class="fas fa-spinner"></i></span> <textarea id="testimonials" name="testimonials" rows="5" placeholder='"Cita." - Nombre, Cargo (uno por línea)'></textarea> <small>Generados por IA son ficticios.</small> </div> </fieldset>
 
+            <!-- ***** NUEVO FIELDSET PORTAFOLIO ***** -->
             <fieldset>
-                 <legend><i class="fas fa-bullhorn"></i> Mensaje Principal</legend>
+                 <legend><i class="fas fa-briefcase"></i> Portafolio <span class="optional">(Opcional)</span></legend>
                  <div class="form-group">
-                    <label for="headline">3. Propuesta de Valor / Titular Principal:</label>
-                    <input type="text" id="headline" name="headline" placeholder="Ej: Diseño webs que convierten visitantes en clientes" required maxlength="120">
-                    <small>El gancho principal. Claro, conciso y atractivo.</small>
-                </div>
-                <div class="form-group">
-                    <label for="description">4. Descripción / Detalles Adicionales:</label>
-                    <textarea id="description" name="description" rows="4" placeholder="Explica brevemente qué ofreces, el problema que resuelves o los beneficios clave."></textarea>
-                </div>
-                 <div class="form-group">
-                    <label for="cta_text">5. Texto del Botón Principal (CTA):</label>
-                    <input type="text" id="cta_text" name="cta_text" placeholder="Ej: Regístrate Gratis, Descargar Guía, Contacta Ahora" required>
-                    <small>La acción principal que quieres que realicen.</small>
-                </div>
-            </fieldset>
-
-             <fieldset>
-                 <legend><i class="fas fa-star"></i> Características Destacadas <span class="optional">(Opcional)</span></legend>
-                 <div class="form-group">
-                    <label for="features">6. Lista de Características/Beneficios:</label>
-                    <textarea id="features" name="features" rows="5" placeholder="Una por línea. Formato: icono:Título:Descripción
-Ej: fa-rocket:Lanzamiento Rápido:Tu web lista en días, no meses.
-Ej: fa-comments:Soporte Experto:Estamos aquí para ayudarte a crecer."></textarea>
-                    <small>Usa clases de Font Awesome (v6) para los iconos (ej: `fa-solid fa-check`, `fa-regular fa-star`). Busca iconos en <a href='https://fontawesome.com/search?m=free&o=r' target='_blank'>Font Awesome</a>.</small>
+                    <label for="portfolio_items">8. Proyectos del Portafolio:</label>
+                    <textarea id="portfolio_items" name="portfolio_items" rows="6" placeholder="Un proyecto por línea. Formato:
+URL_Imagen | Título del Proyecto | Descripción corta | URL_Enlace_Proyecto (opcional)
+Ejemplo:
+https://via.placeholder.com/400x300.png/007bff/fff | Mi Web App | Desarrollo de una aplicación web moderna... | https://miwebapp.com
+https://via.placeholder.com/400x300.png/6c757d/fff | Diseño de Logo | Creación de identidad visual para startup."></textarea>
+                    <small>Usa URLs públicas para las imágenes. Separa cada campo con una barra vertical (`|`). El enlace final es opcional.</small>
                  </div>
             </fieldset>
 
-            <fieldset>
-                 <legend><i class="fas fa-comments"></i> Testimonios <span class="optional">(Opcional)</span></legend>
-                 <div class="form-group">
-                    <label for="testimonials">7. Testimonios de Clientes/Colaboradores:</label>
-                    <textarea id="testimonials" name="testimonials" rows="5" placeholder="Uno por línea. Formato: "Cita del testimonio." - Nombre, Cargo/Empresa
-Ej: "¡El mejor servicio que he contratado!" - Juan Pérez, CEO de Ejemplo Corp
-Ej: "Me ayudó a duplicar mis ventas." - María López, Freelancer"></textarea>
-                    <small>La prueba social es poderosa. Incluye 2-3 testimonios cortos.</small>
-                 </div>
-            </fieldset>
 
             <fieldset>
                  <legend><i class="fas fa-palette"></i> Diseño y Contacto</legend>
-
-                 <!-- ***** CAMBIO: Opciones para generar Logo SVG ***** -->
-                 <div class="form-group">
-                    <label for="logo_style">8. Estilo del Logo Generado:</label>
-                    <select id="logo_style" name="logo_style">
-                        <option value="text">Texto (Nombre completo)</option>
-                        <option value="initials">Iniciales</option>
-                    </select>
-                 </div>
-                 <div class="form-group">
-                    <label for="logo_shape">Forma del Fondo del Logo:</label>
-                    <select id="logo_shape" name="logo_shape">
-                        <option value="none">Sin fondo</option>
-                        <option value="circle">Círculo</option>
-                        <option value="square">Cuadrado Redondeado</option>
-                    </select>
-                    <small>El texto usará el color secundario si hay fondo, y el primario si no hay fondo.</small>
-                 </div>
-
-                 <!-- ***** CAMBIO: Opciones para fondo Hero ***** -->
-                 <div class="form-group">
-                    <label for="hero_background_type">9. Fondo de la Cabecera (Hero):</label>
-                    <select id="hero_background_type" name="hero_background_type">
-                        <option value="color">Color Primario Sólido</option>
-                        <option value="gradient">Gradiente (Primario a Secundario)</option>
-                        <option value="pattern">Patrón SVG Sutil</option>
-                        <option value="image_url">Imagen desde URL</option>
-                    </select>
-                 </div>
-                 <!-- Opciones de patrón (se muestran si se elige 'pattern') -->
-                 <div class="form-group" id="hero_pattern_options" style="display: none;">
-                    <label for="hero_pattern_style">Estilo del Patrón:</label>
-                    <select id="hero_pattern_style" name="hero_pattern_style">
-                        <option value="waves">Ondas Suaves</option>
-                        <option value="dots">Puntos</option>
-                        <option value="lines">Líneas Diagonales</option>
-                        <option value="triangles">Triángulos</option>
-                    </select>
-                 </div>
-                  <!-- Input para URL de imagen (se muestra si se elige 'image_url') -->
-                 <div class="form-group" id="hero_image_url_option" style="display: none;">
-                    <label for="image_hero_url">URL de la Imagen Hero:</label>
-                    <input type="url" id="image_hero_url" name="image_hero_url" placeholder="https://ejemplo.com/imagen_atractiva.jpg">
-                 </div>
-
-
-                 <div class="form-group color-picker-group">
-                    <label for="color_primary">10. Color Principal:</label>
-                    <input type="color" id="color_primary" name="color_primary" value="#007bff">
-                    <small>Para botones, fondos, logo.</small>
-                 </div>
-                 <div class="form-group color-picker-group">
-                    <label for="color_secondary">11. Color Secundario:</label>
-                    <input type="color" id="color_secondary" name="color_secondary" value="#ffffff">
-                    <small>Para texto sobre fondos primarios, gradientes, patrones.</small>
-                 </div>
-
-                 <!-- ... (Resto de campos: Email, Teléfono, Redes Sociales - SIN CAMBIOS) ... -->
-                  <div class="form-group">
-                    <label for="contact_email">12. Email de Contacto Principal:</label>
-                    <input type="email" id="contact_email" name="contact_email" placeholder="tu@email.com" required>
-                 </div>
-                 <div class="form-group">
-                    <label for="contact_phone">13. Teléfono de Contacto: <span class="optional">(Opcional)</span></label>
-                    <input type="tel" id="contact_phone" name="contact_phone" placeholder="+34 600 123 456">
-                 </div>
-                 <div class="form-group">
-                    <label for="social_links">14. Enlaces a Redes Sociales: <span class="optional">(Opcional, uno por línea)</span></label>
-                    <textarea id="social_links" name="social_links" rows="3" placeholder="https://linkedin.com/in/tu_perfil
-https://twitter.com/tu_usuario
-https://github.com/tu_usuario"></textarea>
-                 </div>
-
+                 <!-- ... (Campos 8-14 ahora son 9-15: Logo, Hero, Colores, Contacto - SIN CAMBIOS INTERNOS) ... -->
+                 <div class="form-group"> <label for="logo_style">9. Estilo del Logo:</label> <select id="logo_style" name="logo_style"> <option value="text">Texto</option> <option value="initials">Iniciales</option> </select> </div>
+                 <div class="form-group"> <label for="logo_shape">Forma Logo:</label> <select id="logo_shape" name="logo_shape"> <option value="none">Sin fondo</option> <option value="circle">Círculo</option> <option value="square">Cuadrado</option> </select> <small>Texto usa color secundario si hay fondo.</small> </div>
+                 <div class="form-group"> <label for="hero_background_type">10. Fondo Hero:</label> <select id="hero_background_type" name="hero_background_type"> <option value="color">Color Primario</option> <option value="gradient">Gradiente</option> <option value="pattern">Patrón SVG</option> <option value="image_url">Imagen URL</option> </select> </div>
+                 <div class="form-group" id="hero_pattern_options" style="display: none;"> <label for="hero_pattern_style">Estilo Patrón:</label> <select id="hero_pattern_style" name="hero_pattern_style"> <option value="waves">Ondas</option> <option value="dots">Puntos</option> <option value="lines">Líneas</option> <option value="triangles">Triángulos</option> </select> </div>
+                 <div class="form-group" id="hero_image_url_option" style="display: none;"> <label for="image_hero_url">URL Imagen Hero:</label> <input type="url" id="image_hero_url" name="image_hero_url" placeholder="https://ejemplo.com/imagen.jpg"> </div>
+                 <div class="form-group color-picker-group"> <label for="color_primary">11. Color Principal:</label> <input type="color" id="color_primary" name="color_primary" value="#007bff"> <small>Botones, etc.</small> </div>
+                 <div class="form-group color-picker-group"> <label for="color_secondary">12. Color Secundario:</label> <input type="color" id="color_secondary" name="color_secondary" value="#ffffff"> <small>Texto/acentos.</small> </div>
+                 <div class="form-group"> <label for="contact_email">13. Email Contacto:</label> <input type="email" id="contact_email" name="contact_email" placeholder="tu@email.com" required> </div>
+                 <div class="form-group"> <label for="contact_phone">14. Teléfono: <span class="optional">(Opcional)</span></label> <input type="tel" id="contact_phone" name="contact_phone" placeholder="+34 ..."> </div>
+                 <div class="form-group"> <label for="social_links">15. Redes Sociales: <span class="optional">(Opcional)</span></label> <textarea id="social_links" name="social_links" rows="3" placeholder="URL por línea"></textarea> </div>
             </fieldset>
+
 
             <button type="submit" class="btn btn-primary btn-submit"><i class="fas fa-wand-magic-sparkles"></i> Generar Landing Page Elegante</button>
         </form>
@@ -158,21 +62,17 @@ https://github.com/tu_usuario"></textarea>
         </footer>
     </div> <!-- /container -->
 
-    <!-- Script simple para mostrar/ocultar opciones condicionales -->
+    <!-- Script JS (como antes) -->
     <script>
         const bgTypeSelect = document.getElementById('hero_background_type');
         const patternOptions = document.getElementById('hero_pattern_options');
         const imageUrlOption = document.getElementById('hero_image_url_option');
-
-        function toggleHeroOptions() {
-            const selectedType = bgTypeSelect.value;
-            patternOptions.style.display = selectedType === 'pattern' ? 'block' : 'none';
-            imageUrlOption.style.display = selectedType === 'image_url' ? 'block' : 'none';
-        }
-
-        bgTypeSelect.addEventListener('change', toggleHeroOptions);
-        // Ejecutar al cargar por si hay valores previos (no aplica mucho aquí pero es buena práctica)
-        toggleHeroOptions();
+        function toggleHeroOptions() { const t=bgTypeSelect.value; patternOptions.style.display=t==='pattern'?'block':'none'; imageUrlOption.style.display=t==='image_url'?'block':'none'; }
+        bgTypeSelect.addEventListener('change', toggleHeroOptions); toggleHeroOptions();
+        const headlineInput=document.getElementById('headline'); const descriptionInput=document.getElementById('description'); const featuresTextarea=document.getElementById('features'); const testimonialsTextarea=document.getElementById('testimonials'); const fillFeaturesBtn=document.getElementById('fill-features-ai'); const fillTestimonialsBtn=document.getElementById('fill-testimonials-ai'); const loaderFeatures=document.getElementById('loader-features'); const loaderTestimonials=document.getElementById('loader-testimonials');
+        async function callAI(fieldType, btn, loader, textarea) { const h=headlineInput.value.trim(); const d=descriptionInput.value.trim(); if (!h||!d) { alert('Introduce Título y Descripción para usar IA.'); return; } loader.style.display='inline-block'; btn.disabled=true; try { const r=await fetch("{{ url_for('generate_ai_content') }}", { method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({headline:h, description:d, field_type:fieldType})}); const result=await r.json(); if(r.ok){ textarea.value=result.generated_content||''; } else { console.error("Error API:", result.error); alert(`Error IA: ${result.error||'?'}`); } } catch(e) { console.error('Fetch Error:',e); alert('Error conexión IA.'); } finally { loader.style.display='none'; btn.disabled=false; } }
+        if(fillFeaturesBtn) fillFeaturesBtn.addEventListener('click', ()=>callAI('features',fillFeaturesBtn,loaderFeatures,featuresTextarea));
+        if(fillTestimonialsBtn) fillTestimonialsBtn.addEventListener('click', ()=>callAI('testimonials',fillTestimonialsBtn,loaderTestimonials,testimonialsTextarea));
     </script>
 
 </body>
