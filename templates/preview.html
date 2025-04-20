@@ -77,6 +77,7 @@
             max-width: 700px; /* Limitar ancho para legibilidad */
             margin-left: auto;
             margin-right: auto;
+            /* white-space: pre-line; <- ESTO DEBE ESTAR EN style.css */
         }
         .cta-button {
             display: inline-block;
@@ -162,7 +163,8 @@
         <section class="hero">
             <h2 class="headline">{{ data.headline }}</h2>
             {% if data.description %}
-                <p class="description">{{ data.description | nl2br }}</p> {# nl2br convierte saltos de línea en <br> #}
+                <!-- ***** CAMBIO AQUÍ: Se eliminó '| nl2br' ***** -->
+                <p class="description">{{ data.description }}</p>
             {% endif %}
             {% if data.cta_text %}
                 <!-- El enlace '#' es un placeholder, en una app real llevaría a una acción (formulario, compra, etc.) -->
@@ -182,7 +184,7 @@
         </section>
         {% endif %}
 
-        {% if data.social_links_raw and data.social_links_raw.strip() %} {# Verifica que no esté vacío #}
+        {% if data.social_links_raw and data.social_links_raw.strip() %} {# Asegura que no sea None y no esté vacío #}
         <section class="content-section social-section">
             <h3>Síguenos / Conecta</h3>
             <ul>
@@ -190,25 +192,46 @@
                 {% for link in data.social_links_raw.splitlines() %}
                     {% set cleaned_link = link.strip() %}
                     {% if cleaned_link %} {# Asegura que la línea no esté vacía después de limpiar espacios #}
-                        {# Intenta extraer un nombre más amigable (simple heurística) #}
-                        {% set display_name = cleaned_link.split('/')[-1] %}
-                        {% if 'linkedin.com' in cleaned_link %}
-                            {% set platform = 'LinkedIn' %}
-                        {% elif 'twitter.com' in cleaned_link or 'x.com' in cleaned_link %}
-                             {% set platform = 'Twitter/X' %}
-                        {% elif 'instagram.com' in cleaned_link %}
-                             {% set platform = 'Instagram' %}
-                        {% elif 'facebook.com' in cleaned_link %}
-                             {% set platform = 'Facebook' %}
+                        {% set display_name = 'Enlace' %} {# Nombre por defecto #}
+                        {% set platform = 'Web' %} {# Plataforma por defecto #}
+                        {% set link_parts = cleaned_link.split('/') %}
+
+                        {# Intenta extraer un nombre/plataforma de forma más segura #}
+                        {% if link_parts | length > 2 %}
+                            {# Asume formato como https://dominio.com/usuario -> toma 'usuario' #}
+                            {% set potential_name = link_parts[-1] %}
+                            {% if potential_name %}
+                                {% set display_name = potential_name %}
+                            {% endif %}
+                            {# Intenta obtener el dominio como plataforma #}
+                            {% set domain_part = link_parts[2] | replace('www.', '') %}
+                             {% if domain_part %}
+                                {% if 'linkedin.com' in domain_part %}
+                                    {% set platform = 'LinkedIn' %}
+                                {% elif 'twitter.com' in domain_part or 'x.com' in domain_part %}
+                                     {% set platform = 'Twitter/X' %}
+                                {% elif 'instagram.com' in domain_part %}
+                                     {% set platform = 'Instagram' %}
+                                {% elif 'facebook.com' in domain_part %}
+                                     {% set platform = 'Facebook' %}
+                                {% elif 'github.com' in domain_part %}
+                                     {% set platform = 'GitHub' %}
+                                {% else %}
+                                     {% set platform = domain_part.split('.')[0]|capitalize %} {# Intenta capitalizar el nombre del dominio #}
+                                {% endif %}
+                            {% endif %}
                         {% else %}
-                             {% set platform = cleaned_link.split('/')[2] | replace('www.', '') %} {# Intenta obtener el dominio #}
+                             {# Si no tiene suficientes partes, usa el link como nombre #}
+                             {% set display_name = cleaned_link %}
                         {% endif %}
-                        <li><a href="{{ cleaned_link }}" target="_blank" rel="noopener noreferrer">{{ platform }} - {{ display_name if display_name else 'Perfil' }}</a></li>
-                    {% endif %}
-                {% endfor %}
+
+                        <li><a href="{{ cleaned_link }}" target="_blank" rel="noopener noreferrer">{{ platform }} {% if display_name != platform and display_name | length > 0 %} - {{ display_name }} {% endif %}</a></li> {# Añadido chequeo para display_name #}
+                    {% endif %} {# /if cleaned_link #}
+                {% endfor %} {# /for link #}
             </ul>
         </section>
-        {% endif %}
+        {% endif %} {# /if data.social_links_raw #}
+
 
         <footer>
             <p>© {{ current_year }} {{ data.name }}. Todos los derechos reservados.</p>
