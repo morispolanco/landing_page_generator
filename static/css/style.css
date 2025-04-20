@@ -1,0 +1,149 @@
+/* static/css/style.css */
+
+/* --- Reset básico y fuentes --- */
+*, *::before, *::after {
+    box-sizing: border-box;
+}
+
+body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol";
+    margin: 0;
+    padding: 0;
+    color: #333;
+    line-height: 1.6;
+    background-color: #f4f7f6; /* Un fondo suave general */
+}
+
+/* --- Contenedor principal --- */
+.container {
+    max-width: 980px; /* Un poco más ancho */
+    margin: 25px auto; /* Margen arriba/abajo */
+    padding: 25px 35px; /* Más padding interno */
+    background-color: #ffffff;
+    box-shadow: 0 3px 10px rgba(0,0,0,0.08); /* Sombra más suave */
+    border-radius: 8px;
+}
+
+/* --- Tipografía Base --- */
+h1, h2, h3, h4, h5, h6 {
+    color: #2c3e50; /* Azul oscuro para títulos */
+    line-height: 1.3;
+    margin-top: 1.5em;
+    margin-bottom: 0.7em;
+}
+h1 { font-size: 2.5em; }
+h2 { font-size: 2em; }
+h3 { font-size: 1.7em; }
+p { margin-bottom: 1em; }
+a { color: var(--primary-color, #007bff); text-decoration: none; } /* Usa variable CSS si está definida */
+a:hover { text-decoration: underline; }
+hr { border: none; border-top: 1px solid #eee; margin: 2.5em 0; }
+small { color: #667; font-size: 0.9em; }
+
+/* --- Estilos para el Formulario (index.html) --- */
+form label {
+    display: block;
+    margin-top: 1.2em;
+    margin-bottom: 0.5em;
+    font-weight: bold;
+    color: #555;
+    font-size: 1.05em;
+}
+
+form input[type="text"],
+form input[type="email"],
+form input[type="tel"],
+form input[type="url"],
+form textarea,
+form select,
+form input[type="color"] {
+    width: 100%;
+    padding: 0.8em 1em; /* Padding más cómodo */
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    box-sizing: border-box;
+    font-size: 1em;
+    margin-bottom: 0.3em; /* Espacio antes de la <small> */
+    transition: border-color 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+}
+form input:focus, form textarea:focus, form select:focus {
+    border-color: var(--primary-color, #007bff);
+    box-shadow: 0 0 0 2px color-mix(in srgb, var(--primary-color, #007bff) 20%, transparent); /* Sombra sutil al enfocar */
+    outline: none;
+}
+
+form textarea {
+    min-height: 100px;
+    resize: vertical; /* Permitir redimensionar verticalmente */
+}
+form select {
+    cursor: pointer;
+}
+form input[type="color"] {
+    padding: 0.3em; /* Menos padding para el color picker */
+    height: 40px; /* Altura consistente */
+    cursor: pointer;
+}
+
+form .form-group {
+    margin-bottom: 1.5em; /* Más separación entre grupos */
+}
+form .optional {
+    color: #777;
+    font-size: 0.9em;
+    font-weight: normal;
+}
+form small { /* Estilo para las ayudas debajo de los inputs */
+    display: block;
+    margin-top: 0.3em;
+}
+
+form button[type="submit"] {
+    background-color: #28a745; /* Verde para generar */
+    color: white;
+    padding: 0.9em 2em; /* Botón más prominente */
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 1.15em;
+    font-weight: bold;
+    margin-top: 1.5em;
+    transition: background-color 0.3s ease, transform 0.2s ease;
+}
+form button[type="submit"]:hover {
+    background-color: #218838;
+    transform: translateY(-2px);
+}
+
+/* --- Estilos para el Footer (común a ambas páginas) --- */
+footer {
+    text-align: center;
+    margin-top: 40px;
+    padding-top: 20px;
+    color: #888;
+    font-size: 0.9em;
+    border-top: 1px solid #eee;
+}
+footer p { margin-bottom: 0.3em; }
+
+/* --- Estilos Adicionales para la Preview (preview.html) --- */
+/* (Muchos estilos específicos ya están inline en preview.html para usar el color dinámico) */
+/* Puedes añadir más estilos generales aquí si lo prefieres */
+
+/* Media Query para mejorar responsividad básica */
+@media (max-width: 768px) {
+    .container {
+        margin: 15px;
+        padding: 20px;
+    }
+    h1 { font-size: 2em; }
+    h2 { font-size: 1.7em; }
+    h3 { font-size: 1.4em; }
+
+    .hero { padding: 30px 15px; }
+    .hero h2.headline { font-size: 1.9em; }
+    .hero p.description { font-size: 1.05em; }
+    .cta-button { padding: 12px 25px; font-size: 1.1em; }
+
+    form button[type="submit"] { width: 100%; } /* Botón ocupa todo el ancho en móviles */
+}
