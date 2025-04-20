@@ -3,11 +3,14 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{{ data.name }} - {{ data.headline | truncate(50) }}</title>
+    <title>{{ data.name }} - {{ data.headline | truncate(50) }}</title> {# Título más descriptivo #}
 
+    <!-- Google Fonts (Poppins) -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
+
+    <!-- Font Awesome (para iconos) -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" integrity="sha512-iecdLmaskl7CVkqkXNQ/ZH/XLlvWZOJyj7Yy7tcenmpD1ypASozpmT/E0iPtmFIB46ZmdtAc9eNBvH0H/ZpiBw==" crossorigin="anonymous" referrerpolicy="no-referrer" />
 
     <!-- Enlace CSS: Relativo si es descarga, absoluto (url_for) si es preview -->
@@ -44,10 +47,10 @@
                  background: {{ data.hero_background_css }};
                  /* Determinar color de texto basado en luminancia del color de fondo (simplificado) */
                  {% set bgcolor = data.hero_background_css %}
-                 {% set r = (bgcolor[1:3] | int(base=16)) if bgcolor.startswith('#') else 0 %}
-                 {% set g = (bgcolor[3:5] | int(base=16)) if bgcolor.startswith('#') else 0 %}
-                 {% set b = (bgcolor[5:7] | int(base=16)) if bgcolor.startswith('#') else 0 %}
-                 {% set lum = (0.299 * r + 0.587 * g + 0.114 * b) / 255 %}
+                 {% set r = (bgcolor[1:3] | int(base=16)) if bgcolor and bgcolor.startswith('#') and bgcolor|length == 7 else 0 %}
+                 {% set g = (bgcolor[3:5] | int(base=16)) if bgcolor and bgcolor.startswith('#') and bgcolor|length == 7 else 0 %}
+                 {% set b = (bgcolor[5:7] | int(base=16)) if bgcolor and bgcolor.startswith('#') and bgcolor|length == 7 else 0 %}
+                 {% set lum = (0.299 * r + 0.587 * g + 0.114 * b) / 255 if r != 0 or g != 0 or b != 0 else 0 %}
                  color: {{ '#333333' if lum > 0.5 else '#ffffff' }};
             {% else %}
                 /* Fallback: Color primario sólido */
@@ -55,11 +58,10 @@
                  color: var(--white);
             {% endif %}
         }
-         /* Asegurar que el texto del hero herede el color calculado si no hay imagen */
+         /* Asegurar que el texto del hero herede el color calculado si no hay imagen URL */
          {% if data.hero_background_type != 'image_url' %}
          .hero .headline, .hero .description { color: inherit; }
          {% endif %}
-
     </style>
 </head>
 <!-- Añadir clase si hay imagen URL para estilos condicionales si es necesario -->
@@ -89,7 +91,7 @@
     <nav class="navbar">
         <div class="container">
             <div class="logo">
-                <!-- *** USA logo_src (que tiene SVG logo como Data URL o ruta relativa) *** -->
+                <!-- Usa logo_src (que tiene SVG logo como Data URL o ruta relativa 'images/logo.svg') -->
                 {% if data.logo_src %}
                     <img src="{{ data.logo_src }}" alt="Logo de {{ data.name }}" class="logo-img">
                 {% else %}
@@ -97,7 +99,9 @@
                 {% endif %}
             </div>
              <div class="nav-links">
+                 {# Solo mostrar enlaces a secciones si existen #}
                 {% if data.features_raw and data.features_raw.strip() %}<a href="#features" class="nav-link">Características</a>{% endif %}
+                {% if data.portfolio_raw and data.portfolio_raw.strip() %}<a href="#portfolio" class="nav-link">Portafolio</a>{% endif %}
                 {% if data.testimonials_raw and data.testimonials_raw.strip() %}<a href="#testimonials" class="nav-link">Testimonios</a>{% endif %}
                 <a href="#contact" class="nav-link btn btn-secondary btn-sm">Contacto</a>
             </div>
@@ -107,18 +111,17 @@
     <!-- Sección Hero -->
     <header class="hero">
         <div class="container text-center">
-            <h1 class="headline">{{ data.headline }}</h1>
+            <h1 class="headline">{{ data.headline | default('Increíble Propuesta de Valor Aquí') }}</h1>
             {% if data.description %}
                 <p class="description lead">{{ data.description }}</p>
             {% endif %}
             {% if data.cta_text %}
+                {# El href puede ser '#' o apuntar a #contact o a un enlace externo si se pidiera #}
                 <a href="#contact" class="btn btn-primary btn-lg cta-button">{{ data.cta_text }} <i class="fas fa-arrow-right"></i></a>
             {% endif %}
              <p class="page-type-badge">{{ data.page_type|capitalize }}</p>
         </div>
     </header>
-
-    <!-- ... (Resto de secciones: Features, Testimonials, CTA Secundario, Contacto - SIN CAMBIOS IMPORTANTES, verificar lógica `if` para secciones opcionales) ... -->
 
     <!-- Sección Características/Beneficios -->
     {% if data.features_raw and data.features_raw.strip() %}
@@ -126,16 +129,19 @@
         <div class="container">
             <h2 class="section-title text-center">¿Por qué elegirnos?</h2>
             <div class="features-grid">
+                {# Iterar sobre las líneas de características #}
                 {% for feature_line in data.features_raw.splitlines() %}
+                    {# Intentar parsear el formato icono:Título:Descripción #}
                     {% set parts = feature_line.split(':', 2) %}
                     {% if parts|length >= 3 %}
                         {% set icon_class = parts[0].strip() | default('fa-solid fa-star') %}
                         {% set title = parts[1].strip() %}
                         {% set desc = parts[2].strip() %}
-                        {% if title and desc %} {# Solo mostrar si hay título y descripción #}
+                        {# Solo mostrar si hay título y descripción válidos #}
+                        {% if title and desc %}
                         <div class="feature-item text-center">
                             <div class="feature-icon">
-                                <i class="fa-fw {{ icon_class }}"></i>
+                                <i class="fa-fw {{ icon_class }}"></i> {# fa-fw para ancho fijo #}
                             </div>
                             <h3 class="feature-title">{{ title }}</h3>
                             <p class="feature-description">{{ desc }}</p>
@@ -148,20 +154,65 @@
     </section>
     {% endif %}
 
+    <!-- Sección Portafolio -->
+    {% if data.portfolio_raw and data.portfolio_raw.strip() %}
+    <section id="portfolio" class="section portfolio-section section-bg"> {# section-bg para fondo claro alterno #}
+        <div class="container">
+            <h2 class="section-title text-center">Nuestro Trabajo / Proyectos</h2>
+            <div class="portfolio-grid">
+                 {# Iterar sobre las líneas del portafolio #}
+                {% for item_line in data.portfolio_raw.splitlines() %}
+                    {# Formato: URL_Imagen | Título | Descripción | URL_Enlace (opcional) #}
+                    {% set parts = item_line.split('|', 3) %} {# Limitar a 4 partes máximo #}
+                    {% if parts|length >= 3 %} {# Necesitamos al menos Imagen, Título, Desc #}
+                        {% set image_url = parts[0].strip() %}
+                        {% set title = parts[1].strip() %}
+                        {% set description = parts[2].strip() %}
+                        {% set link_url = parts[3].strip() if parts|length >= 4 else None %}
+
+                        {# Validar que los campos básicos no estén vacíos #}
+                        {% if image_url and title and description %}
+                        <div class="portfolio-item">
+                            <div class="portfolio-image">
+                                <img src="{{ image_url }}" alt="{{ title }}" loading="lazy"> {# Añadir lazy loading #}
+                            </div>
+                            <div class="portfolio-content">
+                                <h3 class="portfolio-title">{{ title }}</h3>
+                                <p class="portfolio-description">{{ description }}</p>
+                                {# Mostrar botón solo si hay URL de enlace #}
+                                {% if link_url %}
+                                    <a href="{{ link_url }}" target="_blank" rel="noopener noreferrer" class="btn btn-secondary btn-sm portfolio-link">
+                                        Ver Proyecto <i class="fas fa-external-link-alt fa-xs"></i>
+                                    </a>
+                                {% endif %}
+                            </div>
+                        </div>
+                        {% endif %} {# /if image_url and title and description #}
+                    {% endif %} {# /if parts|length >= 3 #}
+                {% endfor %}
+            </div>
+        </div>
+    </section>
+    {% endif %}
+
     <!-- Sección Testimonios -->
     {% if data.testimonials_raw and data.testimonials_raw.strip() %}
-    <section id="testimonials" class="section testimonials-section section-bg">
+    {# Alternar fondo si la sección anterior no era section-bg #}
+    <section id="testimonials" class="section testimonials-section {% if not (data.portfolio_raw and data.portfolio_raw.strip()) %}section-bg{% endif %}">
         <div class="container">
             <h2 class="section-title text-center">Lo que dicen de nosotros</h2>
             <div class="testimonials-grid">
+                 {# Iterar sobre las líneas de testimonios #}
                  {% for testimonial_line in data.testimonials_raw.splitlines() %}
+                    {# Intentar parsear el formato "Cita." - Nombre, Cargo #}
                     {% set quote_parts = testimonial_line.split('-', 1) %}
                     {% if quote_parts|length >= 2 %}
                         {% set quote = quote_parts[0].strip().strip('"') %}
                         {% set author_parts = quote_parts[1].split(',', 1) %}
                         {% set author_name = author_parts[0].strip() %}
                         {% set author_title = author_parts[1].strip() if author_parts|length > 1 else '' %}
-                         {% if quote and author_name %} {# Solo mostrar si hay cita y autor #}
+                         {# Solo mostrar si hay cita y autor válidos #}
+                         {% if quote and author_name %}
                         <div class="testimonial-item">
                             <blockquote class="testimonial-quote">
                                 <i class="fas fa-quote-left quote-icon"></i>
@@ -180,19 +231,20 @@
     </section>
     {% endif %}
 
-    <!-- Sección CTA Secundaria (Opcional) -->
+    <!-- Sección CTA Secundaria -->
     <section class="section cta-secondary-section text-center">
         <div class="container">
-            <h2 class="section-title">¿Listo para empezar?</h2>
-            <p class="lead">No esperes más para impulsar tu presencia online.</p>
+            <h2 class="section-title">¿Listo para Empezar?</h2>
+            <p class="lead">Da el siguiente paso para alcanzar tus objetivos online.</p>
             {% if data.cta_text %}
+                 {# El href puede ser '#' o apuntar a #contact #}
                  <a href="#contact" class="btn btn-primary btn-lg cta-button">{{ data.cta_text }} Ahora</a>
             {% endif %}
         </div>
     </section>
 
     <!-- Sección Contacto -->
-    <section id="contact" class="section contact-section section-bg">
+    <section id="contact" class="section contact-section section-bg"> {# Siempre con fondo alterno #}
         <div class="container">
             <h2 class="section-title text-center">Ponte en Contacto</h2>
             <div class="contact-grid">
@@ -204,33 +256,39 @@
                     {% if data.contact_phone %}
                         <p><i class="fas fa-phone fa-fw contact-icon"></i> {{ data.contact_phone }}</p>
                     {% endif %}
+                    {# Renderizar redes sociales solo si hay alguna #}
                     {% if data.social_links_raw and data.social_links_raw.strip() %}
                         <h3 class="social-title">Síguenos</h3>
                         <ul class="social-links-list">
                             {% for link in data.social_links_raw.splitlines() %}
                                 {% set cleaned_link = link.strip() %}
                                 {% if cleaned_link %}
-                                    {% set platform_icon = 'fa-link' %}
-                                    {% set brand_prefix = 'fas' %}
+                                    {# Determinar icono de Font Awesome basado en URL #}
+                                    {% set platform_icon = 'fa-link' %} {# Icono por defecto #}
+                                    {% set brand_prefix = 'fas' %} {# Prefijo por defecto #}
                                     {% if 'linkedin.com' in cleaned_link %}{% set platform_icon = 'fa-linkedin' %}{% set brand_prefix = 'fab' %}
-                                    {% elif 'twitter.com' in cleaned_link or 'x.com' in cleaned_link %}{% set platform_icon = 'fa-twitter' %}{% set brand_prefix = 'fab' %}
+                                    {% elif 'twitter.com' in cleaned_link or 'x.com' in cleaned_link %}{% set platform_icon = 'fa-x-twitter' %}{% set brand_prefix = 'fab' %} {# Icono actualizado para X #}
                                     {% elif 'github.com' in cleaned_link %}{% set platform_icon = 'fa-github' %}{% set brand_prefix = 'fab' %}
                                     {% elif 'instagram.com' in cleaned_link %}{% set platform_icon = 'fa-instagram' %}{% set brand_prefix = 'fab' %}
                                     {% elif 'facebook.com' in cleaned_link %}{% set platform_icon = 'fa-facebook' %}{% set brand_prefix = 'fab' %}
                                     {% elif 'youtube.com' in cleaned_link %}{% set platform_icon = 'fa-youtube' %}{% set brand_prefix = 'fab' %}
                                     {% elif 'behance.net' in cleaned_link %}{% set platform_icon = 'fa-behance' %}{% set brand_prefix = 'fab' %}
                                     {% elif 'dribbble.com' in cleaned_link %}{% set platform_icon = 'fa-dribbble' %}{% set brand_prefix = 'fab' %}
+                                    {% elif 'tiktok.com' in cleaned_link %}{% set platform_icon = 'fa-tiktok' %}{% set brand_prefix = 'fab' %}
+                                    {% elif 'pinterest.com' in cleaned_link %}{% set platform_icon = 'fa-pinterest' %}{% set brand_prefix = 'fab' %}
                                     {% endif %}
-                                    <li><a href="{{ cleaned_link }}" target="_blank" rel="noopener noreferrer" title="Enlace a {{ platform_icon|replace('fa-', '')|capitalize }}"><i class="{{ brand_prefix }} {{ platform_icon }} social-icon"></i></a></li>
+                                    <li><a href="{{ cleaned_link }}" target="_blank" rel="noopener noreferrer" aria-label="Enlace a {{ platform_icon|replace('fa-', '')|capitalize }}" title="{{ platform_icon|replace('fa-', '')|capitalize }}">
+                                        <i class="{{ brand_prefix }} {{ platform_icon }} social-icon"></i>
+                                    </a></li>
                                 {% endif %}
                             {% endfor %}
                         </ul>
                     {% endif %}
                 </div>
                  <div class="contact-message">
-                     <h3>Envíanos un mensaje (Info)</h3>
-                     <p>Esta es una landing page generada. Para contactar, por favor utiliza la información de Email o Teléfono proporcionada.</p>
-                     <p><small>En una versión completa, aquí podría integrarse un formulario de contacto funcional.</small></p>
+                     <h3>Envíanos un Mensaje (Info)</h3>
+                     <p>Esta es una landing page generada automáticamente. Para consultas, por favor utiliza la información de contacto (Email/Teléfono) proporcionada.</p>
+                     <p><small>En una versión completa, aquí podría integrarse un formulario de contacto funcional que envíe los datos al email especificado.</small></p>
                  </div>
             </div>
         </div>
@@ -241,7 +299,7 @@
         <div class="container">
             <div class="footer-content">
                 <div class="footer-col footer-about">
-                     <!-- *** USA logo_src *** -->
+                     <!-- Usa logo_src -->
                      {% if data.logo_src %}
                         <img src="{{ data.logo_src }}" alt="Logo de {{ data.name }}" class="footer-logo">
                     {% else %}
@@ -252,9 +310,12 @@
                 <div class="footer-col footer-links">
                     <h4>Enlaces Rápidos</h4>
                     <ul>
+                         {# Solo mostrar enlaces a secciones si existen #}
                          {% if data.features_raw and data.features_raw.strip() %}<li><a href="#features">Características</a></li>{% endif %}
+                         {% if data.portfolio_raw and data.portfolio_raw.strip() %}<li><a href="#portfolio">Portafolio</a></li>{% endif %}
                          {% if data.testimonials_raw and data.testimonials_raw.strip() %}<li><a href="#testimonials">Testimonios</a></li>{% endif %}
                         <li><a href="#contact">Contacto</a></li>
+                        {# Enlaces de ejemplo, podrían hacerse configurables #}
                         <li><a href="#">Política de Privacidad (Ej.)</a></li>
                         <li><a href="#">Términos de Servicio (Ej.)</a></li>
                     </ul>
@@ -270,7 +331,7 @@
                 </div>
             </div>
             <div class="footer-bottom text-center">
-                <p>© {{ current_year }} {{ data.name }}. Todos los derechos reservados. Página generada por Impulsa Landing.</p>
+                <p>© {{ current_year }} {{ data.name }}. Todos los derechos reservados. Página generada con <a href="https://github.com/google/generative-ai-python" target="_blank" rel="noopener">IA</a> por Impulsa Landing.</p>
             </div>
         </div>
     </footer>
