@@ -4,82 +4,120 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Impulsa Landing - Generador Inteligente</title>
+    <!-- Enlazaremos el nuevo CSS -->
     <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <!-- Font Awesome para iconos en el formulario (opcional) -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 </head>
 <body>
-    <div class="container">
-        <h1>Impulsa Landing 🚀</h1>
-        <p>Crea tu página de aterrizaje personalizada en minutos. Completa los siguientes campos:</p>
+    <div class="container form-container">
+        <header class="form-header">
+             <img src="{{ url_for('static', filename='logo_placeholder.png') }}" alt="Impulsa Landing Logo" class="form-logo">
+             <!-- Puedes reemplazar 'logo_placeholder.png' con un logo real en tu carpeta static -->
+            <h1>Impulsa Landing <i class="fas fa-rocket"></i></h1>
+            <p>Rellena los campos para generar tu página de aterrizaje elegante.</p>
+        </header>
 
         <form method="POST" action="/">
-            <div class="form-group">
-                <label for="page_type">1. Tipo de Página:</label>
-                <select id="page_type" name="page_type" required>
-                    <option value="personal">👤 Personal (Marca, Portafolio)</option>
-                    <option value="empresarial">🏢 Empresarial (Producto, Servicio, Lead Gen)</option>
-                </select>
-            </div>
 
-            <div class="form-group">
-                <label for="name">2. Nombre (Tu nombre o el de tu empresa):</label>
-                <input type="text" id="name" name="name" placeholder="Ej: Ana García / Soluciones Tech" required>
-            </div>
+            <fieldset>
+                <legend><i class="fas fa-info-circle"></i> Información Básica</legend>
+                <div class="form-group">
+                    <label for="page_type">1. Tipo de Página:</label>
+                    <select id="page_type" name="page_type" required>
+                        <option value="personal">👤 Personal (Marca, Portafolio)</option>
+                        <option value="empresarial">🏢 Empresarial (Producto, Servicio, Lead Gen)</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="name">2. Nombre (Tu nombre o el de tu empresa):</label>
+                    <input type="text" id="name" name="name" placeholder="Ej: Ana García / Soluciones Tech" required>
+                </div>
+            </fieldset>
 
-            <div class="form-group">
-                <label for="headline">3. Propuesta de Valor / Titular Principal:</label>
-                <input type="text" id="headline" name="headline" placeholder="Ej: Diseño webs que convierten visitantes en clientes" required maxlength="120">
-                <small>Sé claro y conciso. ¿Qué ofreces principalmente?</small>
-            </div>
+            <fieldset>
+                 <legend><i class="fas fa-bullhorn"></i> Mensaje Principal</legend>
+                 <div class="form-group">
+                    <label for="headline">3. Propuesta de Valor / Titular Principal:</label>
+                    <input type="text" id="headline" name="headline" placeholder="Ej: Diseño webs que convierten visitantes en clientes" required maxlength="120">
+                    <small>El gancho principal. Claro, conciso y atractivo.</small>
+                </div>
+                <div class="form-group">
+                    <label for="description">4. Descripción / Detalles Adicionales:</label>
+                    <textarea id="description" name="description" rows="4" placeholder="Explica brevemente qué ofreces, el problema que resuelves o los beneficios clave."></textarea>
+                </div>
+                 <div class="form-group">
+                    <label for="cta_text">5. Texto del Botón Principal (CTA):</label>
+                    <input type="text" id="cta_text" name="cta_text" placeholder="Ej: Regístrate Gratis, Descargar Guía, Contacta Ahora" required>
+                    <small>La acción principal que quieres que realicen.</small>
+                </div>
+            </fieldset>
 
-            <div class="form-group">
-                <label for="description">4. Descripción / Detalles Adicionales: <span class="optional">(Opcional)</span></label>
-                <textarea id="description" name="description" rows="4" placeholder="Explica un poco más sobre ti, tu producto o servicio. ¿Qué problema resuelves? ¿Cuáles son los beneficios?"></textarea>
-                <small>Un párrafo breve o puntos clave funcionan bien.</small>
-            </div>
+             <fieldset>
+                 <legend><i class="fas fa-star"></i> Características Destacadas <span class="optional">(Opcional)</span></legend>
+                 <div class="form-group">
+                    <label for="features">6. Lista de Características/Beneficios:</label>
+                    <textarea id="features" name="features" rows="5" placeholder="Una por línea. Formato: icono:Título:Descripción
+Ej: fa-rocket:Lanzamiento Rápido:Tu web lista en días, no meses.
+Ej: fa-comments:Soporte Experto:Estamos aquí para ayudarte a crecer."></textarea>
+                    <small>Usa clases de Font Awesome (v6) para los iconos (ej: `fa-solid fa-check`, `fa-regular fa-star`). Busca iconos en <a href='https://fontawesome.com/search?m=free&o=r' target='_blank'>Font Awesome</a>.</small>
+                 </div>
+            </fieldset>
 
-            <div class="form-group">
-                <label for="cta_text">5. Texto del Botón de Llamada a la Acción (CTA):</label>
-                <input type="text" id="cta_text" name="cta_text" placeholder="Ej: Regístrate Gratis, Descargar Guía, Contacta Ahora" required>
-                <small>¿Qué quieres que haga el visitante?</small>
-            </div>
+            <fieldset>
+                 <legend><i class="fas fa-comments"></i> Testimonios <span class="optional">(Opcional)</span></legend>
+                 <div class="form-group">
+                    <label for="testimonials">7. Testimonios de Clientes/Colaboradores:</label>
+                    <textarea id="testimonials" name="testimonials" rows="5" placeholder="Uno por línea. Formato: "Cita del testimonio." - Nombre, Cargo/Empresa
+Ej: "¡El mejor servicio que he contratado!" - Juan Pérez, CEO de Ejemplo Corp
+Ej: "Me ayudó a duplicar mis ventas." - María López, Freelancer"></textarea>
+                    <small>La prueba social es poderosa. Incluye 2-3 testimonios cortos.</small>
+                 </div>
+            </fieldset>
 
-            <hr>
-             <h3>Información de Contacto y Visual</h3>
-
-            <div class="form-group">
-                <label for="contact_email">6. Email de Contacto Principal:</label>
-                <input type="email" id="contact_email" name="contact_email" placeholder="tu@email.com" required>
-            </div>
-
-            <div class="form-group">
-                <label for="contact_phone">7. Teléfono de Contacto: <span class="optional">(Opcional)</span></label>
-                <input type="tel" id="contact_phone" name="contact_phone" placeholder="+34 600 123 456">
-            </div>
-
-            <div class="form-group">
-                <label for="social_links">8. Enlaces a Redes Sociales: <span class="optional">(Opcional, uno por línea)</span></label>
-                <textarea id="social_links" name="social_links" rows="3" placeholder="https://linkedin.com/in/tu_perfil
+            <fieldset>
+                 <legend><i class="fas fa-palette"></i> Diseño y Contacto</legend>
+                 <div class="form-group">
+                    <label for="logo_url">8. URL de tu Logo:</label>
+                    <input type="url" id="logo_url" name="logo_url" placeholder="https://ejemplo.com/mi_logo.png">
+                    <small>Opcional, pero muy recomendado. Fondo transparente idealmente.</small>
+                 </div>
+                  <div class="form-group">
+                    <label for="image_hero_url">9. URL de Imagen para Cabecera (Hero):</label>
+                    <input type="url" id="image_hero_url" name="image_hero_url" placeholder="https://ejemplo.com/imagen_atractiva.jpg">
+                    <small>Opcional. Una imagen relevante y de buena calidad.</small>
+                 </div>
+                 <div class="form-group color-picker-group">
+                    <label for="color_primary">10. Color Principal:</label>
+                    <input type="color" id="color_primary" name="color_primary" value="#007bff">
+                    <small>Para botones y elementos destacados.</small>
+                 </div>
+                 <div class="form-group color-picker-group">
+                    <label for="color_secondary">11. Color Secundario:</label>
+                    <input type="color" id="color_secondary" name="color_secondary" value="#6c757d">
+                    <small>Para acentos o fondos (opcional).</small>
+                 </div>
+                 <div class="form-group">
+                    <label for="contact_email">12. Email de Contacto Principal:</label>
+                    <input type="email" id="contact_email" name="contact_email" placeholder="tu@email.com" required>
+                 </div>
+                 <div class="form-group">
+                    <label for="contact_phone">13. Teléfono de Contacto: <span class="optional">(Opcional)</span></label>
+                    <input type="tel" id="contact_phone" name="contact_phone" placeholder="+34 600 123 456">
+                 </div>
+                 <div class="form-group">
+                    <label for="social_links">14. Enlaces a Redes Sociales: <span class="optional">(Opcional, uno por línea)</span></label>
+                    <textarea id="social_links" name="social_links" rows="3" placeholder="https://linkedin.com/in/tu_perfil
 https://twitter.com/tu_usuario
-https://instagram.com/tu_cuenta"></textarea>
-            </div>
+https://github.com/tu_usuario"></textarea>
+                 </div>
+            </fieldset>
 
-            <div class="form-group">
-                <label for="logo_url">9. URL de tu Logo: <span class="optional">(Opcional, enlace directo a la imagen)</span></label>
-                <input type="url" id="logo_url" name="logo_url" placeholder="https://ejemplo.com/mi_logo.png">
-                <small>Asegúrate de que sea una URL pública.</small>
-            </div>
-
-             <div class="form-group">
-                <label for="color_primary">10. Color Principal de la Marca: <span class="optional">(Opcional)</span></label>
-                <input type="color" id="color_primary" name="color_primary" value="#007bff">
-                 <small>Elige el color dominante para botones y enlaces.</small>
-            </div>
-
-            <button type="submit">✨ Generar Vista Previa</button>
+            <button type="submit" class="btn btn-primary btn-submit"><i class="fas fa-wand-magic-sparkles"></i> Generar Landing Page Elegante</button>
         </form>
 
-        <footer>
-            <p>© {{ current_year }} Impulsa Landing (Demo). Creado con Flask y ❤️.</p>
+        <footer class="form-footer">
+            <p>© {{ current_year }} Impulsa Landing (Demo).</p>
         </footer>
     </div> <!-- /container -->
 </body>
