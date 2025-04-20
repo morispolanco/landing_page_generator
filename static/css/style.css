@@ -1,12 +1,12 @@
-/* static/css/style.css - v2 Elegante */
+/* static/css/style.css - v2.1 Con SVG */
 
 /* --- Variables y Reset --- */
 :root {
     /* Colores (Defaults, se sobreescriben con los del usuario vía <style> en preview.html) */
     --primary-color: #007bff;
-    --secondary-color: #6c757d;
-    --primary-color-dark: #0056b3;
-    --primary-color-light: #cce5ff;
+    --secondary-color: #ffffff; /* Default blanco para texto sobre primario */
+    --primary-color-dark: color-mix(in srgb, var(--primary-color) 85%, black);
+    --primary-color-light: color-mix(in srgb, var(--primary-color) 80%, white);
     --white: #ffffff;
     --gray-100: #f8f9fa;
     --gray-200: #e9ecef;
@@ -98,11 +98,16 @@ body {
     background-color: var(--primary-color);
     border-color: var(--primary-color);
 }
+/* Asegurar contraste texto botón primario */
+.btn-primary {
+    color: var(--secondary-color); /* Usar secundario (normalmente blanco) */
+}
 .btn-primary:hover {
     background-color: var(--primary-color-dark);
     border-color: var(--primary-color-dark);
-    color: var(--white);
+    color: var(--secondary-color); /* Mantener color secundario */
 }
+
 
 .btn-secondary {
     color: var(--primary-color);
@@ -114,6 +119,19 @@ body {
     border-color: var(--primary-color-light);
     color: var(--primary-color-dark);
 }
+
+/* Botón verde para Descarga */
+.btn-success, .btn-download {
+    color: #fff;
+    background-color: #28a745;
+    border-color: #28a745;
+}
+.btn-success:hover, .btn-download:hover {
+    color: #fff;
+    background-color: #218838;
+    border-color: #1e7e34;
+}
+
 
 .btn-lg { padding: 1rem 2rem; font-size: 1.15rem; }
 .btn-sm { padding: 0.5rem 1rem; font-size: 0.875rem; }
@@ -132,46 +150,58 @@ body {
     justify-content: space-between;
     align-items: center;
 }
-.logo-img { max-height: 40px; vertical-align: middle; }
+.logo { /* Contenedor del logo */
+    line-height: 1; /* Evitar espacio extra */
+}
+.logo-img {
+    max-height: 45px; /* Ajustar altura máxima para SVG/imagen */
+    vertical-align: middle;
+    width: auto; /* Permitir que el ancho se ajuste */
+    max-width: 180px; /* Limitar ancho máximo */
+}
 .logo-text { font-size: 1.5rem; font-weight: 700; color: var(--heading-color); text-decoration: none;}
-.nav-links a {
+.nav-links a.nav-link { /* Estilo específico para enlaces de navegación */
     color: var(--gray-600);
     text-decoration: none;
     margin-left: var(--spacing-md);
     font-weight: 500;
     transition: color 0.2s ease;
 }
-.nav-links a:hover, .nav-links a.active {
+.nav-links a.nav-link:hover, .nav-links a.nav-link.active {
     color: var(--primary-color);
 }
-.nav-links .btn { margin-left: var(--spacing-lg); }
+.nav-links .btn { margin-left: var(--spacing-lg); } /* Botón en nav */
 
 
 /* --- Sección Hero --- */
 .hero {
     padding: var(--spacing-xl) 0;
-    background-color: var(--light-bg); /* Fallback si no hay imagen */
-    color: var(--heading-color); /* Color base texto */
-    position: relative; /* Para el badge */
+    position: relative;
     min-height: 60vh; /* Altura mínima */
     display: flex;
-    align-items: center; /* Centrar verticalmente */
+    align-items: center;
     justify-content: center;
+    /* background-*, color se establecen inline en preview.html */
+    background-size: cover;
+    background-position: center center;
+    overflow: hidden; /* Evitar desbordamiento de patrones */
 }
 .hero .headline {
-    font-size: 2.8rem; /* Más grande */
+    font-size: 2.8rem;
     font-weight: 700;
     margin-bottom: var(--spacing-md);
     line-height: 1.3;
-    color: inherit; /* Hereda color (blanco si hay imagen, heading si no) */
+    color: inherit; /* Hereda color del .hero (calculado en <style>) */
+    text-shadow: 0 1px 3px rgba(0, 0, 0, 0.3); /* Sombra para legibilidad */
 }
 .hero .description {
-    font-size: 1.3rem; /* Más grande */
+    font-size: 1.3rem;
     margin-bottom: var(--spacing-lg);
-    max-width: 700px; /* Limitar ancho */
+    max-width: 700px;
     margin-left: auto;
     margin-right: auto;
-     color: inherit;
+    color: inherit; /* Hereda color del .hero */
+    text-shadow: 0 1px 3px rgba(0, 0, 0, 0.3); /* Sombra para legibilidad */
 }
 .hero .cta-button { margin-top: var(--spacing-md); }
 .hero .cta-button i { margin-left: var(--spacing-sm); font-size: 0.9em;}
@@ -180,18 +210,22 @@ body {
     position: absolute;
     top: var(--spacing-md);
     right: var(--spacing-md);
-    background-color: rgba(0, 0, 0, 0.1);
-    color: var(--white);
-    padding: var(--spacing-sm) var(--spacing-md);
+    background-color: rgba(0, 0, 0, 0.2); /* Fondo semitransparente por defecto */
+    color: var(--white); /* Texto blanco por defecto */
+    padding: calc(var(--spacing-sm) * 0.8) var(--spacing-md);
     border-radius: var(--border-radius);
     font-size: 0.8rem;
     font-weight: 600;
-    backdrop-filter: blur(2px); /* Efecto cristal si hay imagen */
+    backdrop-filter: blur(3px);
+    z-index: 10;
 }
-body:not(.hero-has-image) .page-type-badge { /* Estilo si no hay imagen */
+/* Estilo si NO hay imagen URL hero */
+body:not(.hero-has-image-url) .page-type-badge {
      background-color: var(--gray-200);
      color: var(--gray-600);
+     backdrop-filter: none;
 }
+
 
 /* --- Estilos Generales de Sección --- */
 .section { padding: var(--spacing-xl) 0; }
@@ -212,17 +246,16 @@ body:not(.hero-has-image) .page-type-badge { /* Estilo si no hay imagen */
     background-color: var(--primary-color);
     position: absolute;
     bottom: 0;
-    left: 50%;
-    transform: translateX(-50%);
+    left: 0; /* Alineado a la izquierda por defecto */
+    transform: none;
 }
 .text-center .section-title::after { left: 50%; transform: translateX(-50%); }
-/* Para títulos no centrados: .section-title:not(.text-center)::after { left: 0; transform: none; } */
 
 
 /* --- Sección Features --- */
 .features-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); /* Rejilla responsive */
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
     gap: var(--spacing-lg);
     margin-top: var(--spacing-lg);
 }
@@ -238,11 +271,11 @@ body:not(.hero-has-image) .page-type-badge { /* Estilo si no hay imagen */
     box-shadow: var(--box-shadow-lg);
 }
 .feature-icon {
-    font-size: 2.5rem; /* Icono grande */
+    font-size: 2.5rem;
     color: var(--primary-color);
     margin-bottom: var(--spacing-md);
-    display: inline-block; /* Para centrar */
-    line-height: 1; /* Ajustar línea */
+    display: inline-block;
+    line-height: 1;
 }
 .feature-title {
     font-size: 1.3rem;
@@ -268,7 +301,7 @@ body:not(.hero-has-image) .page-type-badge { /* Estilo si no hay imagen */
     background-color: var(--white);
     padding: var(--spacing-lg);
     border-radius: var(--border-radius);
-    border-left: 5px solid var(--primary-color); /* Acento de color */
+    border-left: 5px solid var(--primary-color);
     box-shadow: var(--box-shadow);
     position: relative;
 }
@@ -278,7 +311,7 @@ body:not(.hero-has-image) .page-type-badge { /* Estilo si no hay imagen */
     margin-bottom: var(--spacing-md);
     font-size: 1.05rem;
     position: relative;
-    padding-left: 40px; /* Espacio para icono de cita */
+    padding-left: 40px;
 }
 .quote-icon {
     position: absolute;
@@ -289,7 +322,7 @@ body:not(.hero-has-image) .page-type-badge { /* Estilo si no hay imagen */
     opacity: 0.8;
 }
 .testimonial-author {
-    display: block; /* Para que ocupe toda la línea */
+    display: block;
     margin-top: var(--spacing-md);
     text-align: right;
 }
@@ -308,18 +341,31 @@ body:not(.hero-has-image) .page-type-badge { /* Estilo si no hay imagen */
 .cta-secondary-section {
     background-color: var(--secondary-color); /* Color secundario de fondo */
     color: var(--white);
+    border-top: 1px solid var(--border-color); /* Separador visual */
 }
-.cta-secondary-section .section-title { color: var(--white); }
-.cta-secondary-section .section-title::after { background-color: var(--white); }
-.cta-secondary-section .lead { color: rgba(255, 255, 255, 0.8); }
+/* Determinar color de texto basado en el color secundario */
+.cta-secondary-section {
+     /* Cálculo simple de luminancia (aproximado) */
+     {% set bgcolor = data.color_secondary | default('#6c757d') %}
+     {% set r = (bgcolor[1:3] | int(base=16)) if bgcolor.startswith('#') else 108 %}
+     {% set g = (bgcolor[3:5] | int(base=16)) if bgcolor.startswith('#') else 117 %}
+     {% set b = (bgcolor[5:7] | int(base=16)) if bgcolor.startswith('#') else 125 %}
+     {% set lum = (0.299 * r + 0.587 * g + 0.114 * b) / 255 %}
+     color: {{ '#333333' if lum > 0.5 else '#ffffff' }};
+}
+
+.cta-secondary-section .section-title { color: inherit; } /* Hereda color calculado */
+.cta-secondary-section .section-title::after { background-color: currentColor; } /* Línea del color del texto */
+.cta-secondary-section .lead { color: inherit; opacity: 0.8; }
 .cta-secondary-section .btn-primary {
-    background-color: var(--white); /* Botón inverso */
-    color: var(--secondary-color);
-    border-color: var(--white);
+    /* Botón primario sobre fondo secundario */
+    background-color: var(--primary-color);
+    color: var(--secondary-color); /* Usar color secundario del usuario para el texto del botón */
+    border-color: var(--primary-color);
 }
 .cta-secondary-section .btn-primary:hover {
-     background-color: var(--gray-200);
-     border-color: var(--gray-200);
+    background-color: var(--primary-color-dark);
+    border-color: var(--primary-color-dark);
 }
 
 /* --- Sección Contacto --- */
@@ -329,7 +375,7 @@ body:not(.hero-has-image) .page-type-badge { /* Estilo si no hay imagen */
     grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
     gap: var(--spacing-xl);
     margin-top: var(--spacing-lg);
-    align-items: start; /* Alinear arriba */
+    align-items: start;
 }
 .contact-info h3 {
     font-size: 1.4rem;
@@ -337,7 +383,7 @@ body:not(.hero-has-image) .page-type-badge { /* Estilo si no hay imagen */
     margin-bottom: var(--spacing-md);
 }
 .contact-info p {
-    display: flex; /* Alinear icono y texto */
+    display: flex;
     align-items: center;
     margin-bottom: var(--spacing-md);
     font-size: 1.05rem;
@@ -345,8 +391,8 @@ body:not(.hero-has-image) .page-type-badge { /* Estilo si no hay imagen */
 .contact-icon {
     color: var(--primary-color);
     margin-right: var(--spacing-md);
-    font-size: 1.3em; /* Iconos un poco más grandes */
-    width: 25px; /* Ancho fijo para alinear texto */
+    font-size: 1.3em;
+    width: 25px;
     text-align: center;
 }
 .contact-info a { color: var(--primary-color); font-weight: 500; }
@@ -357,15 +403,16 @@ body:not(.hero-has-image) .page-type-badge { /* Estilo si no hay imagen */
     padding: 0;
     margin: var(--spacing-md) 0 0 0;
     display: flex;
-    gap: var(--spacing-md); /* Espacio entre iconos */
+    flex-wrap: wrap; /* Permitir que los iconos pasen a la siguiente línea */
+    gap: var(--spacing-md);
 }
 .social-links-list li a {
-    display: inline-block;
+    display: inline-flex; /* Usar flex para centrar mejor */
+    justify-content: center;
+    align-items: center;
     width: 40px;
     height: 40px;
-    line-height: 40px; /* Centrar icono verticalmente */
-    text-align: center;
-    border-radius: 50%; /* Círculo */
+    border-radius: 50%;
     background-color: var(--primary-color-light);
     color: var(--primary-color);
     font-size: 1.2rem;
@@ -374,15 +421,16 @@ body:not(.hero-has-image) .page-type-badge { /* Estilo si no hay imagen */
 .social-links-list li a:hover {
     background-color: var(--primary-color);
     color: var(--white);
-    transform: scale(1.1); /* Efecto zoom ligero */
+    transform: scale(1.1);
 }
 .contact-message h3 { font-size: 1.4rem; margin-bottom: var(--spacing-md); }
 .contact-message p { color: var(--gray-600); }
+.contact-message small { font-size: 0.9em; color: var(--gray-600); display: block; margin-top: var(--spacing-sm); }
 
 /* --- Footer --- */
 .footer {
-    background-color: var(--gray-800); /* Fondo oscuro */
-    color: var(--gray-400); /* Texto claro */
+    background-color: var(--gray-800);
+    color: var(--gray-400);
     padding: var(--spacing-xl) 0 var(--spacing-md) 0;
     font-size: 0.9rem;
 }
@@ -398,19 +446,25 @@ body:not(.hero-has-image) .page-type-badge { /* Estilo si no hay imagen */
     font-weight: 600;
     margin-bottom: var(--spacing-md);
 }
-.footer-logo { max-height: 45px; margin-bottom: var(--spacing-md); filter: brightness(0) invert(1); /* Hacer logo blanco */ }
+.footer-logo {
+    max-height: 50px;
+    margin-bottom: var(--spacing-md);
+    width: auto;
+    max-width: 200px;
+    /* No filter needed for SVG with correct colors */
+}
 .footer-logo-text { color: var(--white); font-size: 1.6rem; font-weight: 700; margin-bottom: var(--spacing-sm); }
 .footer-tagline { font-style: italic; opacity: 0.8; }
 .footer-links ul { list-style: none; padding: 0; margin: 0; }
 .footer-links li { margin-bottom: var(--spacing-sm); }
 .footer-links a { color: var(--gray-400); text-decoration: none; transition: color 0.2s ease, padding-left 0.2s ease; }
-.footer-links a:hover { color: var(--white); padding-left: 5px; } /* Indentar al pasar ratón */
+.footer-links a:hover { color: var(--white); padding-left: 5px; }
 .footer-contact p { display: flex; align-items: center; margin-bottom: var(--spacing-sm); }
 .footer-contact .fa-fw { margin-right: var(--spacing-sm); color: var(--primary-color); }
 .footer-contact a { color: var(--gray-400); }
 .footer-contact a:hover { color: var(--white); }
 .footer-bottom {
-    border-top: 1px solid var(--gray-600); /* Línea separadora */
+    border-top: 1px solid var(--gray-600);
     padding-top: var(--spacing-lg);
     margin-top: var(--spacing-lg);
     font-size: 0.85rem;
@@ -419,9 +473,55 @@ body:not(.hero-has-image) .page-type-badge { /* Estilo si no hay imagen */
 .footer-bottom a { color: var(--gray-400); font-weight: 500; }
 .footer-bottom a:hover { color: var(--white); }
 
+/* --- Barra de Controles Preview/Descarga --- */
+.preview-controls {
+    background-color: var(--gray-800);
+    color: var(--gray-200);
+    padding: var(--spacing-sm) 0;
+    font-size: 0.9rem;
+    position: sticky; /* Pegajosa arriba */
+    top: 0;
+    z-index: 1001; /* Encima de la navbar */
+}
+.preview-controls .container {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap; /* Permitir que pase a siguiente línea en móvil */
+    gap: var(--spacing-sm);
+}
+.preview-controls span {
+    font-weight: 600;
+}
+.preview-controls span i {
+    margin-right: var(--spacing-sm);
+    color: var(--primary-color-light);
+}
+.preview-controls div { /* Contenedor de botones */
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-md);
+}
+.download-form {
+    margin: 0;
+    display: inline-block;
+}
+.btn-download i {
+    margin-right: var(--spacing-sm);
+}
+/* Ajuste para que la navbar no quede oculta */
+.navbar {
+    top: 40px; /* Altura aprox de .preview-controls */
+}
+/* Si la preview no tiene barra de controles, la navbar va arriba */
+body:not(:has(.preview-controls)) .navbar {
+    top: 0;
+}
+
+
 /* --- Estilos para el Formulario (index.html) --- */
 .form-container {
-    max-width: 800px; /* Formulario un poco más estrecho */
+    max-width: 800px;
     margin-top: var(--spacing-lg);
     margin-bottom: var(--spacing-lg);
 }
@@ -441,9 +541,11 @@ form legend {
     font-weight: 600;
     color: var(--primary-color);
     font-size: 1.2rem;
+    width: auto; /* Para que no ocupe toda la línea */
+    border-bottom: none; /* Quitar borde por defecto en algunos navegadores */
 }
 form legend i { margin-right: var(--spacing-sm); }
-/* Reutiliza estilos de input/textarea/select de la versión anterior */
+
 form input[type="text"],
 form input[type="email"],
 form input[type="tel"],
@@ -458,24 +560,41 @@ form select {
     font-size: var(--font-size-base);
     margin-bottom: 0.3em;
     transition: border-color 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+    background-color: var(--white); /* Fondo blanco */
+    color: var(--text-color);
 }
 form input:focus, form textarea:focus, form select:focus {
     border-color: var(--primary-color);
     box-shadow: 0 0 0 3px color-mix(in srgb, var(--primary-color) 20%, transparent);
     outline: none;
 }
+
 form textarea { min-height: 120px; resize: vertical; }
 form select { cursor: pointer; appearance: none; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3E%3Cpath stroke='%236b7280' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='M6 8l4 4 4-4'/%3E%3C/svg%3E"); background-position: right 0.7em top 50%; background-repeat: no-repeat; background-size: 1.5em; padding-right: 2.5em; }
 form .form-group { margin-bottom: var(--spacing-md); }
 form label { display: block; margin-bottom: var(--spacing-sm); font-weight: 600; color: var(--heading-color); }
-form small { display: block; margin-top: var(--spacing-sm); font-size: 0.85rem; color: var(--gray-600); }
+form small { display: block; margin-top: var(--spacing-sm); font-size: 0.85rem; color: var(--gray-600); line-height: 1.4;}
+form small a { color: var(--primary-color); text-decoration: underline;}
+form small a:hover { color: var(--primary-color-dark);}
 form .optional { font-weight: 400; color: var(--gray-600); font-size: 0.9em; }
 .color-picker-group label { display: inline-block; vertical-align: middle; margin-right: var(--spacing-sm); }
-.color-picker-group input[type="color"] { width: 45px; height: 45px; padding: 2px; border-radius: 50%; cursor: pointer; vertical-align: middle; border: 1px solid var(--border-color); }
+.color-picker-group input[type="color"] { width: 45px; height: 45px; padding: 2px; border-radius: 50%; cursor: pointer; vertical-align: middle; border: 1px solid var(--border-color); background-color: transparent;}
 .color-picker-group small { display: inline; margin-left: var(--spacing-sm); }
 form .btn-submit { width: 100%; padding-top: 1rem; padding-bottom: 1rem; font-size: 1.2rem; }
 form .btn-submit i { margin-right: var(--spacing-sm); }
-.form-footer { text-align: center; margin-top: var(--spacing-lg); color: var(--gray-600); font-size: 0.9rem;}
+
+/* Opciones condicionales del formulario */
+#hero_pattern_options, #hero_image_url_option {
+    padding-left: var(--spacing-md);
+    margin-top: var(--spacing-md);
+    border-left: 3px solid var(--border-color);
+    background-color: var(--light-bg); /* Fondo ligero para destacar */
+    padding-top: var(--spacing-sm);
+    padding-bottom: var(--spacing-sm);
+    padding-right: var(--spacing-md);
+    border-radius: 0 var(--border-radius) var(--border-radius) 0;
+}
+
 
 /* --- Media Queries para Responsividad --- */
 @media (max-width: 992px) {
@@ -490,22 +609,28 @@ form .btn-submit i { margin-right: var(--spacing-sm); }
 @media (max-width: 768px) {
     :root { --font-size-base: 15px; }
     .container { max-width: 720px; }
+    .navbar { top: auto; /* Dejar de ser sticky si controles están arriba */ }
+    body:has(.preview-controls) .navbar {
+        top: 60px; /* Ajustar si controles ocupan más espacio */
+    }
     .navbar .container { flex-direction: column; align-items: flex-start; }
-    .nav-links { margin-top: var(--spacing-md); width: 100%; display: flex; justify-content: space-between;}
-    .nav-links a { margin-left: 0; }
+    .nav-links { margin-top: var(--spacing-md); width: 100%; display: flex; justify-content: space-between; flex-wrap: wrap; gap: var(--spacing-sm);}
+    .nav-links a.nav-link { margin-left: 0; }
+    .nav-links .btn { margin-left: auto; /* Mover botón a la derecha */ }
     .hero { padding: var(--spacing-lg) 0; min-height: auto;}
     .hero .headline { font-size: 2.1rem; }
     .hero .description { font-size: 1.1rem; }
     .section { padding: var(--spacing-lg) 0; }
     .section-title { font-size: 1.8rem; }
-    .contact-grid { grid-template-columns: 1fr; } /* Apilar en móvil */
+    .contact-grid { grid-template-columns: 1fr; }
     .contact-message { margin-top: var(--spacing-lg); }
     .footer-content { grid-template-columns: 1fr; text-align: center;}
     .footer-col { margin-bottom: var(--spacing-md); }
     .footer-logo, .footer-logo-text { display: inline-block; }
     .footer-links ul { display: inline-block; text-align: left; }
     .footer-contact p { justify-content: center; }
-    .form-container { margin-left: 15px; margin-right: 15px; }
+    .form-container { margin-left: 15px; margin-right: 15px; width: auto; }
+    .preview-controls .container { justify-content: center; } /* Centrar controles en móvil */
 }
 
 @media (max-width: 576px) {
@@ -517,7 +642,10 @@ form .btn-submit i { margin-right: var(--spacing-sm); }
     .features-grid { grid-template-columns: 1fr; }
     .testimonials-grid { grid-template-columns: 1fr; }
     .nav-links { flex-direction: column; align-items: flex-start; gap: var(--spacing-sm);}
-    .nav-links .btn { margin-top: var(--spacing-sm); align-self: flex-start;}
+    .nav-links .btn { margin-left: 0; align-self: flex-start;}
     form legend { font-size: 1.1rem; }
     .form-container { padding: var(--spacing-md); }
+    .preview-controls div { flex-direction: column; align-items: stretch; width: 100%; } /* Botones ocupan ancho */
+    .preview-controls div .btn { width: 100%; text-align: center; }
+    .download-form { width: 100%; }
 }
