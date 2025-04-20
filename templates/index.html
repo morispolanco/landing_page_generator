@@ -72,7 +72,7 @@
                     <button type="button" class="btn btn-secondary btn-sm ai-button" id="fill-services-ai" title="Rellenar con Inteligencia Artificial"><i class="fas fa-magic"></i> IA</button>
                     <span class="ai-loader" id="loader-services"><i class="fas fa-spinner"></i></span>
                     <textarea id="services" name="services" rows="5" placeholder="icono:Título del Servicio:Descripción breve (uno por línea)">{{ form_data.get('services_raw', '') }}</textarea>
-                    <small>Describe los servicios principales. Usa iconos relevantes.</small>
+                    <small>Describe los servicios principales que ofreces. Usa iconos relevantes.</small>
                  </div>
             </fieldset>
 
@@ -153,7 +153,7 @@ Un proyecto por línea.">{{ form_data.get('portfolio_raw', '') }}</textarea>
                  </div>
                  <div class="form-group">
                     <label for="contact_phone">15. Teléfono: <span class="optional">(Opcional)</span></label>
-                    <input type="tel" id="contact_phone" name="contact_phone" placeholder="+34 ..." value="{{ form_data.get('contact_phone', '') }}">
+                    <input type="tel" id="contact_phone" name="contact_phone" placeholder="+XX XXX XXX XXX" value="{{ form_data.get('contact_phone', '') }}">
                  </div>
                  <div class="form-group">
                     <label for="social_links">16. Redes Sociales: <span class="optional">(Opcional)</span></label>
@@ -169,16 +169,16 @@ Un proyecto por línea.">{{ form_data.get('portfolio_raw', '') }}</textarea>
         </footer>
     </div> <!-- /container -->
 
-    <!-- Script JS (Añadido listener para Servicios) -->
+    <!-- Script JS (con listener para Servicios) -->
     <script>
         const bgTypeSelect=document.getElementById('hero_background_type');const patternOptions=document.getElementById('hero_pattern_options');const imageUrlOption=document.getElementById('hero_image_url_option');function toggleHeroOptions(){const t=bgTypeSelect.value;patternOptions.style.display=t==='pattern'?'block':'none';imageUrlOption.style.display=t==='image_url'?'block':'none';}bgTypeSelect.addEventListener('change',toggleHeroOptions);toggleHeroOptions();
         const headlineInput=document.getElementById('headline');const descriptionInput=document.getElementById('description');
         const featuresTextarea=document.getElementById('features');const fillFeaturesBtn=document.getElementById('fill-features-ai');const loaderFeatures=document.getElementById('loader-features');
-        const servicesTextarea=document.getElementById('services');const fillServicesBtn=document.getElementById('fill-services-ai');const loaderServices=document.getElementById('loader-services'); // Nuevo
+        const servicesTextarea=document.getElementById('services');const fillServicesBtn=document.getElementById('fill-services-ai');const loaderServices=document.getElementById('loader-services');
         const testimonialsTextarea=document.getElementById('testimonials');const fillTestimonialsBtn=document.getElementById('fill-testimonials-ai');const loaderTestimonials=document.getElementById('loader-testimonials');
-        async function callAI(fieldType,btn,loader,textarea){const h=headlineInput.value.trim();const d=descriptionInput.value.trim();if(!h||!d){alert('Introduce Título y Descripción para usar IA.');return;}loader.style.display='inline-block';btn.disabled=true;try{const r=await fetch("{{url_for('generate_ai_content')}}",{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({headline:h,description:d,field_type:fieldType})});const result=await r.json();if(r.ok){textarea.value=result.generated_content||'';}else{console.error("Error API:",result.error);alert(`Error IA: ${result.error||'?'}`);}}catch(e){console.error('Fetch Error:',e);alert('Error conexión IA.');}finally{loader.style.display='none';btn.disabled=false;}}
+        async function callAI(fieldType,btn,loader,textarea){const h=headlineInput.value.trim();const d=descriptionInput.value.trim();if(!h||!d){alert('Introduce Título y Descripción para usar IA.');return;}loader.style.display='inline-block';btn.disabled=true;try{const r=await fetch("{{url_for('generate_ai_content')}}",{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({headline:h,description:d,field_type:fieldType})});const result=await r.json();if(r.ok){textarea.value=result.generated_content||'';}else{console.error("Error API:",result.error);alert(`Error IA: ${result.error||'Error desconocido'}`);}}catch(e){console.error('Fetch Error:',e);alert('Error de conexión al intentar generar contenido.');}finally{loader.style.display='none';btn.disabled=false;}}
         if(fillFeaturesBtn)fillFeaturesBtn.addEventListener('click',()=>callAI('features',fillFeaturesBtn,loaderFeatures,featuresTextarea));
-        if(fillServicesBtn)fillServicesBtn.addEventListener('click',()=>callAI('services',fillServicesBtn,loaderServices,servicesTextarea)); // Nuevo Listener
+        if(fillServicesBtn)fillServicesBtn.addEventListener('click',()=>callAI('services',fillServicesBtn,loaderServices,servicesTextarea)); // Listener Servicios
         if(fillTestimonialsBtn)fillTestimonialsBtn.addEventListener('click',()=>callAI('testimonials',fillTestimonialsBtn,loaderTestimonials,testimonialsTextarea));
     </script>
 
