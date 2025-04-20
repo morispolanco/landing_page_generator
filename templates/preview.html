@@ -3,241 +3,226 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Vista Previa: {{ data.name }}</title>
+    <title>{{ data.name }} - {{ data.headline | truncate(50) }}</title> {# Título más descriptivo #}
+
+    <!-- Google Fonts (Ejemplo: Poppins) -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
+
+    <!-- Font Awesome (para iconos) -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" integrity="sha512-iecdLmaskl7CVkqkXNQ/ZH/XLlvWZOJyj7Yy7tcenmpD1ypASozpmT/E0iPtmFIB46ZmdtAc9eNBvH0H/ZpiBw==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+
+    <!-- Nuestro CSS Rediseñado -->
     <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
-    <!-- Estilos dinámicos basados en la selección del usuario -->
+
+    <!-- Estilos dinámicos -->
     <style>
         :root {
-            --primary-color: {{ data.color_primary | default('#007bff') }}; /* Variable CSS para el color */
+            --primary-color: {{ data.color_primary | default('#007bff') }};
+            --secondary-color: {{ data.color_secondary | default('#6c757d') }};
+            /* Generar variaciones más claras/oscuras (simplificado) */
+            --primary-color-dark: color-mix(in srgb, var(--primary-color) 85%, black);
+            --primary-color-light: color-mix(in srgb, var(--primary-color) 80%, white);
         }
-
-        /* Aplicar color primario a elementos clave */
-        .hero h1, .hero h2, .contact-section h3, .social-section h3 {
-             /* Podrías decidir si los títulos usan el color primario o uno neutro */
-             /* color: var(--primary-color); */
-             color: #333; /* Ejemplo con color neutro para títulos */
-        }
-
-        .cta-button {
-            background-color: var(--primary-color);
-        }
-        .cta-button:hover {
-            background-color: color-mix(in srgb, var(--primary-color) 85%, black); /* Oscurecer al pasar el ratón */
-        }
-
-        .contact-section a, .social-section a {
-            color: var(--primary-color);
-        }
-         .social-section a:hover {
-             text-decoration: underline;
-         }
-
-         /* Estilos adicionales específicos de la preview */
-         header {
-            text-align: center;
-            padding: 30px 0 15px 0; /* Más espacio arriba */
-            border-bottom: 1px solid #eee;
-            margin-bottom: 30px;
-        }
-        header img.logo {
-            max-height: 70px; /* Un poco más grande */
-            max-width: 200px; /* Limitar ancho también */
-            margin-bottom: 15px;
-            object-fit: contain; /* Evitar distorsión */
-        }
-         header h1.page-title {
-            margin-top: 0;
-            margin-bottom: 5px;
-            font-size: 2em;
-            color: #333;
-         }
-         header p.page-type {
-             color: #777;
-             font-style: italic;
-             margin-top: 0;
-         }
-
+        {% if data.image_hero_url %}
         .hero {
-            text-align: center;
-            padding: 50px 25px;
-            background-color: #f8f9fa;
-            border-radius: 8px;
-            margin-bottom: 40px;
+            background-image: linear-gradient(rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.5)), url('{{ data.image_hero_url }}');
+            background-size: cover;
+            background-position: center center;
+            color: #ffffff; /* Texto blanco sobre imagen oscura */
         }
-        .hero h2.headline { /* Clase específica para el titular principal */
-            font-size: 2.4em; /* Más grande */
-            margin-bottom: 0.6em;
-            color: #333; /* O var(--primary-color) si prefieres */
-            line-height: 1.3;
+        .hero .headline, .hero .description {
+             color: #ffffff;
         }
-        .hero p.description { /* Clase específica para la descripción */
-            font-size: 1.15em;
-            color: #555;
-            margin-bottom: 2em; /* Más espacio antes del botón */
-            max-width: 700px; /* Limitar ancho para legibilidad */
-            margin-left: auto;
-            margin-right: auto;
-            /* white-space: pre-line; <- ESTO DEBE ESTAR EN style.css */
-        }
-        .cta-button {
-            display: inline-block;
-            /* background-color se define arriba con var(--primary-color) */
-            color: white;
-            padding: 14px 35px; /* Botón más grande */
-            text-decoration: none;
-            font-size: 1.2em; /* Texto del botón más grande */
-            font-weight: bold;
-            border-radius: 5px;
-            transition: background-color 0.3s ease, transform 0.2s ease;
-            border: none; /* Quitar borde por si acaso */
-            cursor: pointer;
-        }
-        .cta-button:hover {
-            transform: translateY(-2px); /* Efecto sutil al pasar el ratón */
-            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
-        }
-
-        .content-section { /* Clase genérica para secciones de contacto/social */
-            margin-top: 40px;
-            padding-top: 25px;
-            border-top: 1px solid #eee;
-        }
-         .content-section h3 {
-             margin-bottom: 15px;
-             font-size: 1.6em;
-             color: #444;
-         }
-        .content-section p, .social-section ul {
-            margin-bottom: 10px;
-            font-size: 1.05em;
-        }
-        .social-section ul {
-            list-style: none;
-            padding: 0;
-        }
-         .social-section li {
-             margin-bottom: 8px;
-         }
-         .social-section a {
-             text-decoration: none;
-             transition: color 0.2s ease;
-         }
-
-        /* Aviso de Vista Previa */
-        .preview-notice {
-            background-color: #fff3cd;
-            color: #856404;
-            padding: 12px 15px;
-            text-align: center;
-            border: 1px solid #ffeeba;
-            border-radius: 5px;
-            margin: 15px; /* Añadido margen */
-            font-size: 0.95em;
-        }
-        .preview-notice a {
-            color: #0056b3;
-            font-weight: bold;
-            text-decoration: none;
-        }
-        .preview-notice a:hover {
-            text-decoration: underline;
-        }
-
+        {% endif %}
     </style>
 </head>
 <body>
-    <div class="preview-notice">
-        <strong>👀 Modo Vista Previa:</strong> Esta es una demostración de cómo se vería tu página.
-        <br><a href="/">Volver al formulario para editar o crear una nueva</a>
-    </div>
 
-    <div class="container">
-        <header>
-            {% if data.logo_url %}
-                <img src="{{ data.logo_url }}" alt="Logo de {{ data.name }}" class="logo">
-            {% endif %}
-            <h1 class="page-title">{{ data.name }}</h1>
-            <p class="page-type"><em>({{ data.page_type|capitalize }})</em></p>
-        </header>
+    <!-- Barra de Navegación (Simple) -->
+    <nav class="navbar">
+        <div class="container">
+            <div class="logo">
+                {% if data.logo_url %}
+                    <img src="{{ data.logo_url }}" alt="Logo de {{ data.name }}" class="logo-img">
+                {% else %}
+                    <span class="logo-text">{{ data.name }}</span>
+                {% endif %}
+            </div>
+            <div class="nav-links">
+                <!-- Enlaces podrían ir a secciones: #features, #testimonials, #contact -->
+                <a href="#features" class="nav-link">Características</a>
+                <a href="#testimonials" class="nav-link">Testimonios</a>
+                <a href="#contact" class="nav-link btn btn-secondary btn-sm">Contacto</a>
+            </div>
+        </div>
+    </nav>
 
-        <section class="hero">
-            <h2 class="headline">{{ data.headline }}</h2>
+    <!-- Sección Hero -->
+    <header class="hero">
+        <div class="container text-center">
+            <h1 class="headline">{{ data.headline }}</h1>
             {% if data.description %}
-                <!-- ***** CAMBIO AQUÍ: Se eliminó '| nl2br' ***** -->
-                <p class="description">{{ data.description }}</p>
+                <p class="description lead">{{ data.description }}</p>
             {% endif %}
             {% if data.cta_text %}
-                <!-- El enlace '#' es un placeholder, en una app real llevaría a una acción (formulario, compra, etc.) -->
-                <a href="#" class="cta-button">{{ data.cta_text }}</a>
+                <a href="#contact" class="btn btn-primary btn-lg cta-button">{{ data.cta_text }} <i class="fas fa-arrow-right"></i></a>
+                {# El href="#contact" es un ejemplo, podría ser un enlace externo #}
             {% endif %}
-        </section>
+             <p class="page-type-badge">{{ data.page_type|capitalize }}</p>
+        </div>
+    </header>
 
-        {% if data.contact_email or data.contact_phone %}
-        <section class="content-section contact-section">
-            <h3>Información de Contacto</h3>
-            {% if data.contact_email %}
-                <p><strong>📧 Email:</strong> <a href="mailto:{{ data.contact_email }}">{{ data.contact_email }}</a></p>
+    <!-- Sección Características/Beneficios -->
+    {% if data.features_raw and data.features_raw.strip() %}
+    <section id="features" class="section features-section">
+        <div class="container">
+            <h2 class="section-title text-center">¿Por qué elegirnos?</h2>
+            <div class="features-grid">
+                {% for feature_line in data.features_raw.splitlines() %}
+                    {% set parts = feature_line.split(':', 2) %}
+                    {% if parts|length >= 3 %}
+                        {% set icon_class = parts[0].strip() | default('fa-solid fa-star') %}
+                        {% set title = parts[1].strip() %}
+                        {% set desc = parts[2].strip() %}
+                        <div class="feature-item text-center">
+                            <div class="feature-icon">
+                                <i class="fa-fw {{ icon_class }}"></i> {# fa-fw para ancho fijo #}
+                            </div>
+                            <h3 class="feature-title">{{ title }}</h3>
+                            <p class="feature-description">{{ desc }}</p>
+                        </div>
+                    {% endif %}
+                {% endfor %}
+            </div>
+        </div>
+    </section>
+    {% endif %}
+
+    <!-- Sección Testimonios -->
+    {% if data.testimonials_raw and data.testimonials_raw.strip() %}
+    <section id="testimonials" class="section testimonials-section section-bg">
+        <div class="container">
+            <h2 class="section-title text-center">Lo que dicen de nosotros</h2>
+            <div class="testimonials-grid">
+                 {% for testimonial_line in data.testimonials_raw.splitlines() %}
+                    {% set quote_parts = testimonial_line.split('-', 1) %}
+                    {% if quote_parts|length >= 2 %}
+                        {% set quote = quote_parts[0].strip().strip('"') %}
+                        {% set author_parts = quote_parts[1].split(',', 1) %}
+                        {% set author_name = author_parts[0].strip() %}
+                        {% set author_title = author_parts[1].strip() if author_parts|length > 1 else '' %}
+                        <div class="testimonial-item">
+                            <blockquote class="testimonial-quote">
+                                <i class="fas fa-quote-left quote-icon"></i>
+                                {{ quote }}
+                            </blockquote>
+                            <cite class="testimonial-author">
+                                <span class="author-name">{{ author_name }}</span>
+                                {% if author_title %}<span class="author-title">{{ author_title }}</span>{% endif %}
+                            </cite>
+                        </div>
+                    {% endif %}
+                 {% endfor %}
+            </div>
+        </div>
+    </section>
+    {% endif %}
+
+    <!-- Sección CTA Secundaria (Opcional) -->
+    <section class="section cta-secondary-section text-center">
+        <div class="container">
+            <h2 class="section-title">¿Listo para empezar?</h2>
+            <p class="lead">No esperes más para impulsar tu presencia online.</p>
+            {% if data.cta_text %}
+                 <a href="#contact" class="btn btn-primary btn-lg cta-button">{{ data.cta_text }} Ahora</a>
             {% endif %}
-            {% if data.contact_phone %}
-                <p><strong>📞 Teléfono:</strong> {{ data.contact_phone }}</p>
-            {% endif %}
-        </section>
-        {% endif %}
+        </div>
+    </section>
 
-        {% if data.social_links_raw and data.social_links_raw.strip() %} {# Asegura que no sea None y no esté vacío #}
-        <section class="content-section social-section">
-            <h3>Síguenos / Conecta</h3>
-            <ul>
-                {# Iterar sobre cada línea y limpiarla #}
-                {% for link in data.social_links_raw.splitlines() %}
-                    {% set cleaned_link = link.strip() %}
-                    {% if cleaned_link %} {# Asegura que la línea no esté vacía después de limpiar espacios #}
-                        {% set display_name = 'Enlace' %} {# Nombre por defecto #}
-                        {% set platform = 'Web' %} {# Plataforma por defecto #}
-                        {% set link_parts = cleaned_link.split('/') %}
-
-                        {# Intenta extraer un nombre/plataforma de forma más segura #}
-                        {% if link_parts | length > 2 %}
-                            {# Asume formato como https://dominio.com/usuario -> toma 'usuario' #}
-                            {% set potential_name = link_parts[-1] %}
-                            {% if potential_name %}
-                                {% set display_name = potential_name %}
-                            {% endif %}
-                            {# Intenta obtener el dominio como plataforma #}
-                            {% set domain_part = link_parts[2] | replace('www.', '') %}
-                             {% if domain_part %}
-                                {% if 'linkedin.com' in domain_part %}
-                                    {% set platform = 'LinkedIn' %}
-                                {% elif 'twitter.com' in domain_part or 'x.com' in domain_part %}
-                                     {% set platform = 'Twitter/X' %}
-                                {% elif 'instagram.com' in domain_part %}
-                                     {% set platform = 'Instagram' %}
-                                {% elif 'facebook.com' in domain_part %}
-                                     {% set platform = 'Facebook' %}
-                                {% elif 'github.com' in domain_part %}
-                                     {% set platform = 'GitHub' %}
-                                {% else %}
-                                     {% set platform = domain_part.split('.')[0]|capitalize %} {# Intenta capitalizar el nombre del dominio #}
+    <!-- Sección Contacto -->
+    <section id="contact" class="section contact-section section-bg">
+        <div class="container">
+            <h2 class="section-title text-center">Ponte en Contacto</h2>
+            <div class="contact-grid">
+                <div class="contact-info">
+                    <h3>Detalles de Contacto</h3>
+                    {% if data.contact_email %}
+                        <p><i class="fas fa-envelope fa-fw contact-icon"></i> <a href="mailto:{{ data.contact_email }}">{{ data.contact_email }}</a></p>
+                    {% endif %}
+                    {% if data.contact_phone %}
+                        <p><i class="fas fa-phone fa-fw contact-icon"></i> {{ data.contact_phone }}</p>
+                    {% endif %}
+                    {% if data.social_links_raw and data.social_links_raw.strip() %}
+                        <h3 class="social-title">Síguenos</h3>
+                        <ul class="social-links-list">
+                            {% for link in data.social_links_raw.splitlines() %}
+                                {% set cleaned_link = link.strip() %}
+                                {% if cleaned_link %}
+                                    {% set platform_icon = 'fa-link' %} {# Icono por defecto #}
+                                    {% if 'linkedin.com' in cleaned_link %}{% set platform_icon = 'fa-linkedin' %}
+                                    {% elif 'twitter.com' in cleaned_link or 'x.com' in cleaned_link %}{% set platform_icon = 'fa-twitter' %}
+                                    {% elif 'github.com' in cleaned_link %}{% set platform_icon = 'fa-github' %}
+                                    {% elif 'instagram.com' in cleaned_link %}{% set platform_icon = 'fa-instagram' %}
+                                    {% elif 'facebook.com' in cleaned_link %}{% set platform_icon = 'fa-facebook' %}
+                                    {% endif %}
+                                    <li><a href="{{ cleaned_link }}" target="_blank" rel="noopener noreferrer" title="Enlace a {{ platform_icon|replace('fa-', '')|capitalize }}"><i class="fab {{ platform_icon }} social-icon"></i></a></li>
                                 {% endif %}
-                            {% endif %}
-                        {% else %}
-                             {# Si no tiene suficientes partes, usa el link como nombre #}
-                             {% set display_name = cleaned_link %}
-                        {% endif %}
+                            {% endfor %}
+                        </ul>
+                    {% endif %}
+                </div>
+                 <!-- Podría ir un formulario de contacto aquí en una versión más avanzada -->
+                 <div class="contact-message">
+                     <h3>Envíanos un mensaje (Ejemplo)</h3>
+                     <p>Normalmente aquí iría un formulario, pero puedes contactarnos directamente usando la información proporcionada.</p>
+                     <!-- Placeholder para un mapa si fuera relevante -->
+                     <!-- <div class="map-placeholder">Mapa (Placeholder)</div> -->
+                 </div>
+            </div>
+        </div>
+    </section>
 
-                        <li><a href="{{ cleaned_link }}" target="_blank" rel="noopener noreferrer">{{ platform }} {% if display_name != platform and display_name | length > 0 %} - {{ display_name }} {% endif %}</a></li> {# Añadido chequeo para display_name #}
-                    {% endif %} {# /if cleaned_link #}
-                {% endfor %} {# /for link #}
-            </ul>
-        </section>
-        {% endif %} {# /if data.social_links_raw #}
-
-
-        <footer>
-            <p>© {{ current_year }} {{ data.name }}. Todos los derechos reservados.</p>
-            <p><small>Página generada con Impulsa Landing (Demo)</small></p>
-        </footer>
-    </div> <!-- /container -->
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-col footer-about">
+                     {% if data.logo_url %}
+                        <img src="{{ data.logo_url }}" alt="Logo de {{ data.name }}" class="footer-logo">
+                    {% else %}
+                        <h4 class="footer-logo-text">{{ data.name }}</h4>
+                    {% endif %}
+                    <p class="footer-tagline">{{ data.headline | truncate(70) }}</p>
+                </div>
+                <div class="footer-col footer-links">
+                    <h4>Enlaces Rápidos</h4>
+                    <ul>
+                        <li><a href="#features">Características</a></li>
+                        <li><a href="#testimonials">Testimonios</a></li>
+                        <li><a href="#contact">Contacto</a></li>
+                        <!-- Placeholder Links -->
+                        <li><a href="#">Política de Privacidad</a></li>
+                        <li><a href="#">Términos de Servicio</a></li>
+                    </ul>
+                </div>
+                <div class="footer-col footer-contact">
+                     <h4>Contacto Rápido</h4>
+                     {% if data.contact_email %}
+                        <p><i class="fas fa-envelope fa-fw"></i> <a href="mailto:{{ data.contact_email }}">{{ data.contact_email }}</a></p>
+                     {% endif %}
+                     {% if data.contact_phone %}
+                         <p><i class="fas fa-phone fa-fw"></i> {{ data.contact_phone }}</p>
+                     {% endif %}
+                </div>
+            </div>
+            <div class="footer-bottom text-center">
+                <p>© {{ current_year }} {{ data.name }}. Todos los derechos reservados. Página generada por <a href="https://tu-dominio.com" target="_blank">Impulsa Landing</a>.</p>
+                 {# Reemplaza https://tu-dominio.com con el enlace real si lo tienes #}
+            </div>
+        </div>
+    </footer>
 
 </body>
 </html>
