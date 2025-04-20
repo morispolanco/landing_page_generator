@@ -1,0 +1,25 @@
+// vercel.json
+{
+  "version": 2,
+  "builds": [
+    {
+      "src": "app.py", // El archivo que contiene tu instancia de Flask (app = Flask(__name__))
+      "use": "@vercel/python",
+      "config": { "maxLambdaSize": "15mb" } // Configuración opcional, puede ser útil
+    },
+    {
+      "src": "static/**", // Patrón para tus archivos estáticos
+      "use": "@vercel/static"
+    }
+  ],
+  "routes": [
+    {
+      "src": "/static/(.*)", // Enruta las solicitudes a /static/...
+      "dest": "/static/$1"   // Sírvelas desde el directorio estático construido
+    },
+    {
+      "src": "/(.*)",     // Enruta todas las demás solicitudes...
+      "dest": "app.py"     // ...a tu aplicación Flask
+    }
+  ]
+}
