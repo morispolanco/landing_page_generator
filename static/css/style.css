@@ -16,12 +16,12 @@ body {
 
 /* --- Contenedor principal --- */
 .container {
-    max-width: 980px; /* Un poco más ancho */
-    margin: 25px auto; /* Margen arriba/abajo */
-    padding: 25px 35px; /* Más padding interno */
-    background-color: #ffffff;
-    box-shadow: 0 3px 10px rgba(0,0,0,0.08); /* Sombra más suave */
-    border-radius: 8px;
+    max-width: 980px; /* Ancho máximo del contenido */
+    margin: 25px auto; /* Centrado con margen arriba/abajo */
+    padding: 25px 35px; /* Padding interno */
+    background-color: #ffffff; /* Fondo blanco para el contenido */
+    box-shadow: 0 3px 10px rgba(0,0,0,0.08); /* Sombra suave */
+    border-radius: 8px; /* Bordes redondeados */
 }
 
 /* --- Tipografía Base --- */
@@ -35,10 +35,25 @@ h1 { font-size: 2.5em; }
 h2 { font-size: 2em; }
 h3 { font-size: 1.7em; }
 p { margin-bottom: 1em; }
-a { color: var(--primary-color, #007bff); text-decoration: none; } /* Usa variable CSS si está definida */
-a:hover { text-decoration: underline; }
-hr { border: none; border-top: 1px solid #eee; margin: 2.5em 0; }
-small { color: #667; font-size: 0.9em; }
+a {
+    color: var(--primary-color, #007bff); /* Usa variable CSS si está definida, fallback azul */
+    text-decoration: none;
+    transition: color 0.2s ease;
+}
+a:hover {
+    text-decoration: underline;
+    /* Puedes oscurecer un poco el color primario al pasar el ratón si quieres */
+    /* color: color-mix(in srgb, var(--primary-color, #007bff) 85%, black); */
+}
+hr { /* Separador visual en el formulario */
+    border: none;
+    border-top: 1px solid #eee;
+    margin: 2.5em 0;
+}
+small { /* Texto de ayuda pequeño */
+    color: #667;
+    font-size: 0.9em;
+}
 
 /* --- Estilos para el Formulario (index.html) --- */
 form label {
@@ -68,21 +83,34 @@ form input[type="color"] {
 }
 form input:focus, form textarea:focus, form select:focus {
     border-color: var(--primary-color, #007bff);
-    box-shadow: 0 0 0 2px color-mix(in srgb, var(--primary-color, #007bff) 20%, transparent); /* Sombra sutil al enfocar */
+    box-shadow: 0 0 0 3px color-mix(in srgb, var(--primary-color, #007bff) 20%, transparent); /* Sombra sutil al enfocar */
     outline: none;
 }
 
 form textarea {
-    min-height: 100px;
+    min-height: 100px; /* Altura mínima */
     resize: vertical; /* Permitir redimensionar verticalmente */
 }
 form select {
     cursor: pointer;
+    appearance: none; /* Quitar estilo por defecto del navegador */
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3E%3Cpath stroke='%236b7280' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='M6 8l4 4 4-4'/%3E%3C/svg%3E"); /* Flecha desplegable personalizada */
+    background-position: right 0.7em top 50%;
+    background-repeat: no-repeat;
+    background-size: 1.5em;
+    padding-right: 2.5em; /* Espacio para la flecha */
 }
 form input[type="color"] {
     padding: 0.3em; /* Menos padding para el color picker */
-    height: 40px; /* Altura consistente */
+    height: 45px; /* Altura consistente con otros inputs */
     cursor: pointer;
+    vertical-align: middle; /* Alinear mejor con la etiqueta */
+    width: 50px; /* Ancho fijo pequeño */
+    border-radius: 4px;
+}
+form .form-group label[for="color_primary"] {
+    display: inline-block; /* Para que el input color se ponga al lado */
+    margin-right: 10px;
 }
 
 form .form-group {
@@ -96,6 +124,7 @@ form .optional {
 form small { /* Estilo para las ayudas debajo de los inputs */
     display: block;
     margin-top: 0.3em;
+    padding-left: 2px; /* Pequeña indentación */
 }
 
 form button[type="submit"] {
@@ -109,32 +138,161 @@ form button[type="submit"] {
     font-weight: bold;
     margin-top: 1.5em;
     transition: background-color 0.3s ease, transform 0.2s ease;
+    display: inline-block; /* Para que no ocupe todo el ancho por defecto */
 }
 form button[type="submit"]:hover {
-    background-color: #218838;
-    transform: translateY(-2px);
+    background-color: #218838; /* Verde más oscuro */
+    transform: translateY(-2px); /* Pequeño salto */
+    box-shadow: 0 4px 8px rgba(0,0,0,0.1);
 }
 
-/* --- Estilos para el Footer (común a ambas páginas) --- */
+/* --- Estilos para la Vista Previa (preview.html) --- */
+
+/* Aviso de Vista Previa */
+.preview-notice {
+    background-color: #fff3cd;
+    color: #856404;
+    padding: 12px 15px;
+    text-align: center;
+    border: 1px solid #ffeeba;
+    border-radius: 5px;
+    margin: 15px; /* Margen exterior */
+    font-size: 0.95em;
+}
+.preview-notice a {
+    color: #0056b3;
+    font-weight: bold;
+    text-decoration: none;
+}
+.preview-notice a:hover {
+    text-decoration: underline;
+}
+
+/* Cabecera de la Landing */
+header {
+    text-align: center;
+    padding: 30px 0 15px 0;
+    border-bottom: 1px solid #eee;
+    margin-bottom: 30px;
+}
+header img.logo {
+    max-height: 70px;
+    max-width: 200px;
+    margin-bottom: 15px;
+    object-fit: contain; /* Evita distorsión si la imagen no es proporcional */
+}
+header h1.page-title {
+    margin-top: 0;
+    margin-bottom: 5px;
+    font-size: 2em;
+    color: #333;
+}
+header p.page-type {
+    color: #777;
+    font-style: italic;
+    margin-top: 0;
+    font-size: 1em;
+}
+
+/* Sección Hero (Principal) */
+.hero {
+    text-align: center;
+    padding: 50px 25px;
+    background-color: #f8f9fa; /* Fondo gris muy claro */
+    border-radius: 8px;
+    margin-bottom: 40px;
+}
+.hero h2.headline {
+    font-size: 2.4em;
+    margin-bottom: 0.6em;
+    color: #333;
+    line-height: 1.3;
+}
+.hero p.description {
+    font-size: 1.15em;
+    color: #555;
+    margin-bottom: 2em;
+    max-width: 700px; /* Limita el ancho para mejor legibilidad */
+    margin-left: auto;
+    margin-right: auto;
+    white-space: pre-line; /* --- ¡IMPORTANTE! Preserva saltos de línea --- */
+}
+.cta-button {
+    display: inline-block;
+    background-color: var(--primary-color, #007bff); /* Color principal del botón */
+    color: white; /* Texto blanco */
+    padding: 14px 35px;
+    text-decoration: none;
+    font-size: 1.2em;
+    font-weight: bold;
+    border-radius: 5px;
+    transition: background-color 0.3s ease, transform 0.2s ease, box-shadow 0.2s ease;
+    border: none;
+    cursor: pointer;
+}
+.cta-button:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0,0,0,0.15);
+     /* Oscurecer al pasar el ratón usando color-mix (navegadores modernos) */
+    background-color: color-mix(in srgb, var(--primary-color, #007bff) 85%, black);
+}
+
+/* Secciones de Contenido (Contacto, Redes) */
+.content-section {
+    margin-top: 40px;
+    padding-top: 25px;
+    border-top: 1px solid #eee; /* Línea separadora */
+}
+.content-section h3 {
+    margin-bottom: 15px;
+    font-size: 1.6em;
+    color: #444;
+}
+.content-section p {
+    margin-bottom: 10px;
+    font-size: 1.05em;
+}
+.content-section p strong { /* Iconos visuales */
+    display: inline-block;
+    margin-right: 8px;
+}
+.social-section ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+.social-section li {
+    margin-bottom: 8px;
+    font-size: 1.05em;
+}
+.social-section a {
+    /* El color se hereda de la regla 'a' general */
+    text-decoration: none;
+}
+/* Podrías añadir iconos aquí con FontAwesome o SVGs si quisieras */
+
+/* --- Footer (Común) --- */
 footer {
     text-align: center;
-    margin-top: 40px;
-    padding-top: 20px;
+    margin-top: 50px;
+    padding-top: 25px;
     color: #888;
     font-size: 0.9em;
     border-top: 1px solid #eee;
 }
-footer p { margin-bottom: 0.3em; }
+footer p {
+    margin-bottom: 0.5em;
+}
+footer small {
+    color: #aaa;
+}
 
-/* --- Estilos Adicionales para la Preview (preview.html) --- */
-/* (Muchos estilos específicos ya están inline en preview.html para usar el color dinámico) */
-/* Puedes añadir más estilos generales aquí si lo prefieres */
-
-/* Media Query para mejorar responsividad básica */
+/* --- Media Query para Responsividad --- */
 @media (max-width: 768px) {
+    body { font-size: 16px; } /* Base de fuente para móvil */
     .container {
-        margin: 15px;
-        padding: 20px;
+        margin: 15px; /* Menos margen en los lados */
+        padding: 20px 25px; /* Menos padding */
     }
     h1 { font-size: 2em; }
     h2 { font-size: 1.7em; }
@@ -143,7 +301,14 @@ footer p { margin-bottom: 0.3em; }
     .hero { padding: 30px 15px; }
     .hero h2.headline { font-size: 1.9em; }
     .hero p.description { font-size: 1.05em; }
-    .cta-button { padding: 12px 25px; font-size: 1.1em; }
+    .cta-button { padding: 12px 25px; font-size: 1.1em; width: 100%; } /* Botón ocupa todo el ancho */
 
-    form button[type="submit"] { width: 100%; } /* Botón ocupa todo el ancho en móviles */
+    form button[type="submit"] { width: 100%; } /* Botón del formulario ocupa todo el ancho */
+}
+
+@media (max-width: 480px) {
+    h1 { font-size: 1.8em; }
+    h2 { font-size: 1.5em; }
+    .hero h2.headline { font-size: 1.7em; }
+    .container { padding: 15px 20px; }
 }
