@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Impulsa Landing - Generador Inteligente</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+    <div class="container">
+        <h1>Impulsa Landing 🚀</h1>
+        <p>Crea tu página de aterrizaje personalizada en minutos. Completa los siguientes campos:</p>
+
+        <form method="POST" action="/">
+            <div class="form-group">
+                <label for="page_type">1. Tipo de Página:</label>
+                <select id="page_type" name="page_type" required>
+                    <option value="personal">👤 Personal (Marca, Portafolio)</option>
+                    <option value="empresarial">🏢 Empresarial (Producto, Servicio, Lead Gen)</option>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label for="name">2. Nombre (Tu nombre o el de tu empresa):</label>
+                <input type="text" id="name" name="name" placeholder="Ej: Ana García / Soluciones Tech" required>
+            </div>
+
+            <div class="form-group">
+                <label for="headline">3. Propuesta de Valor / Titular Principal:</label>
+                <input type="text" id="headline" name="headline" placeholder="Ej: Diseño webs que convierten visitantes en clientes" required maxlength="120">
+                <small>Sé claro y conciso. ¿Qué ofreces principalmente?</small>
+            </div>
+
+            <div class="form-group">
+                <label for="description">4. Descripción / Detalles Adicionales: <span class="optional">(Opcional)</span></label>
+                <textarea id="description" name="description" rows="4" placeholder="Explica un poco más sobre ti, tu producto o servicio. ¿Qué problema resuelves? ¿Cuáles son los beneficios?"></textarea>
+                <small>Un párrafo breve o puntos clave funcionan bien.</small>
+            </div>
+
+            <div class="form-group">
+                <label for="cta_text">5. Texto del Botón de Llamada a la Acción (CTA):</label>
+                <input type="text" id="cta_text" name="cta_text" placeholder="Ej: Regístrate Gratis, Descargar Guía, Contacta Ahora" required>
+                <small>¿Qué quieres que haga el visitante?</small>
+            </div>
+
+            <hr>
+             <h3>Información de Contacto y Visual</h3>
+
+            <div class="form-group">
+                <label for="contact_email">6. Email de Contacto Principal:</label>
+                <input type="email" id="contact_email" name="contact_email" placeholder="tu@email.com" required>
+            </div>
+
+            <div class="form-group">
+                <label for="contact_phone">7. Teléfono de Contacto: <span class="optional">(Opcional)</span></label>
+                <input type="tel" id="contact_phone" name="contact_phone" placeholder="+34 600 123 456">
+            </div>
+
+            <div class="form-group">
+                <label for="social_links">8. Enlaces a Redes Sociales: <span class="optional">(Opcional, uno por línea)</span></label>
+                <textarea id="social_links" name="social_links" rows="3" placeholder="https://linkedin.com/in/tu_perfil
+https://twitter.com/tu_usuario
+https://instagram.com/tu_cuenta"></textarea>
+            </div>
+
+            <div class="form-group">
+                <label for="logo_url">9. URL de tu Logo: <span class="optional">(Opcional, enlace directo a la imagen)</span></label>
+                <input type="url" id="logo_url" name="logo_url" placeholder="https://ejemplo.com/mi_logo.png">
+                <small>Asegúrate de que sea una URL pública.</small>
+            </div>
+
+             <div class="form-group">
+                <label for="color_primary">10. Color Principal de la Marca: <span class="optional">(Opcional)</span></label>
+                <input type="color" id="color_primary" name="color_primary" value="#007bff">
+                 <small>Elige el color dominante para botones y enlaces.</small>
+            </div>
+
+            <button type="submit">✨ Generar Vista Previa</button>
+        </form>
+
+        <footer>
+            <p>© {{ current_year }} Impulsa Landing (Demo). Creado con Flask y ❤️.</p>
+        </footer>
+    </div> <!-- /container -->
+</body>
+</html>
