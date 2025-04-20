@@ -3,23 +3,23 @@
   "version": 2,
   "builds": [
     {
-      "src": "app.py", // El archivo que contiene tu instancia de Flask (app = Flask(__name__))
+      "src": "app.py",
       "use": "@vercel/python",
-      "config": { "maxLambdaSize": "15mb" } // Configuración opcional, puede ser útil
+      "config": { "maxLambdaSize": "15mb" }
     },
     {
-      "src": "static/**", // Patrón para tus archivos estáticos
+      "src": "static/**",
       "use": "@vercel/static"
     }
   ],
   "routes": [
     {
-      "src": "/static/(.*)", // Enruta las solicitudes a /static/...
-      "dest": "/static/$1"   // Sírvelas desde el directorio estático construido
+      "src": "/static/(.*)",
+      "dest": "/static/$1"
     },
     {
-      "src": "/(.*)",     // Enruta todas las demás solicitudes...
-      "dest": "app.py"     // ...a tu aplicación Flask
+      "src": "/(.*)",
+      "dest": "app.py"
     }
   ]
 }
