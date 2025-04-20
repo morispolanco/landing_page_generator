@@ -3,57 +3,102 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{{ data.name }} - {{ data.headline | truncate(50) }}</title> {# Título más descriptivo #}
+    <title>{{ data.name }} - {{ data.headline | truncate(50) }}</title>
 
-    <!-- Google Fonts (Ejemplo: Poppins) -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
-
-    <!-- Font Awesome (para iconos) -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" integrity="sha512-iecdLmaskl7CVkqkXNQ/ZH/XLlvWZOJyj7Yy7tcenmpD1ypASozpmT/E0iPtmFIB46ZmdtAc9eNBvH0H/ZpiBw==" crossorigin="anonymous" referrerpolicy="no-referrer" />
 
-    <!-- Nuestro CSS Rediseñado -->
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <!-- Enlace CSS: Relativo si es descarga, absoluto (url_for) si es preview -->
+    {% if is_download %}
+        <link rel="stylesheet" href="css/style.css">
+    {% else %}
+        <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    {% endif %}
 
     <!-- Estilos dinámicos -->
     <style>
         :root {
             --primary-color: {{ data.color_primary | default('#007bff') }};
-            --secondary-color: {{ data.color_secondary | default('#6c757d') }};
-            /* Generar variaciones más claras/oscuras (simplificado) */
+            --secondary-color: {{ data.color_secondary | default('#ffffff') }}; /* Blanco por defecto */
             --primary-color-dark: color-mix(in srgb, var(--primary-color) 85%, black);
             --primary-color-light: color-mix(in srgb, var(--primary-color) 80%, white);
         }
-        {% if data.image_hero_url %}
+
+        /* Aplicar fondo Hero dinámicamente */
         .hero {
-            background-image: linear-gradient(rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.5)), url('{{ data.image_hero_url }}');
-            background-size: cover;
-            background-position: center center;
-            color: #ffffff; /* Texto blanco sobre imagen oscura */
+            {% if data.hero_background_type == 'pattern' and data.hero_pattern_src %}
+                background-color: {{ data.color_primary }}; /* Color base */
+                background-image: url('{{ data.hero_pattern_src }}');
+                color: var(--secondary-color); /* Usar secundario para texto sobre patrón */
+            {% elif data.hero_background_type == 'gradient' and data.hero_background_css %}
+                background: {{ data.hero_background_css }};
+                color: var(--white); /* Asumir texto blanco sobre gradiente */
+            {% elif data.hero_background_type == 'image_url' and data.image_hero_url %}
+                 background-image: linear-gradient(rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.5)), url('{{ data.image_hero_url | escape }}');
+                 background-size: cover;
+                 background-position: center center;
+                 color: #ffffff;
+            {% elif data.hero_background_type == 'color' and data.hero_background_css %}
+                 background: {{ data.hero_background_css }};
+                 /* Determinar color de texto basado en luminancia del color de fondo (simplificado) */
+                 {% set bgcolor = data.hero_background_css %}
+                 {% set r = (bgcolor[1:3] | int(base=16)) if bgcolor.startswith('#') else 0 %}
+                 {% set g = (bgcolor[3:5] | int(base=16)) if bgcolor.startswith('#') else 0 %}
+                 {% set b = (bgcolor[5:7] | int(base=16)) if bgcolor.startswith('#') else 0 %}
+                 {% set lum = (0.299 * r + 0.587 * g + 0.114 * b) / 255 %}
+                 color: {{ '#333333' if lum > 0.5 else '#ffffff' }};
+            {% else %}
+                /* Fallback: Color primario sólido */
+                 background: var(--primary-color);
+                 color: var(--white);
+            {% endif %}
         }
-        .hero .headline, .hero .description {
-             color: #ffffff;
-        }
-        {% endif %}
+         /* Asegurar que el texto del hero herede el color calculado si no hay imagen */
+         {% if data.hero_background_type != 'image_url' %}
+         .hero .headline, .hero .description { color: inherit; }
+         {% endif %}
+
     </style>
 </head>
-<body>
+<!-- Añadir clase si hay imagen URL para estilos condicionales si es necesario -->
+<body class="{{ 'hero-has-image-url' if data.hero_background_type == 'image_url' and data.image_hero_url else '' }}">
 
-    <!-- Barra de Navegación (Simple) -->
+    <!-- Barra de Controles (Solo en modo Preview) -->
+    {% if not is_download %}
+    <div class="preview-controls">
+        <div class="container">
+            <span><i class="fas fa-eye"></i> Modo Vista Previa</span>
+            <div>
+                 <a href="/" class="btn btn-secondary btn-sm"><i class="fas fa-edit"></i> Volver a Editar</a>
+                 <!-- Formulario para descargar -->
+                 <form action="{{ url_for('download') }}" method="POST" class="download-form">
+                    <!-- Campo oculto con datos de configuración (SIN SVGs grandes) -->
+                    <input type="hidden" name="page_data_json" value="{{ data_json | escape }}">
+                    <button type="submit" class="btn btn-success btn-sm btn-download">
+                        <i class="fas fa-download"></i> Descargar Código (.zip)
+                    </button>
+                 </form>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+
+    <!-- Barra de Navegación -->
     <nav class="navbar">
         <div class="container">
             <div class="logo">
-                {% if data.logo_url %}
-                    <img src="{{ data.logo_url }}" alt="Logo de {{ data.name }}" class="logo-img">
+                <!-- *** USA logo_src (que tiene SVG logo como Data URL o ruta relativa) *** -->
+                {% if data.logo_src %}
+                    <img src="{{ data.logo_src }}" alt="Logo de {{ data.name }}" class="logo-img">
                 {% else %}
                     <span class="logo-text">{{ data.name }}</span>
                 {% endif %}
             </div>
-            <div class="nav-links">
-                <!-- Enlaces podrían ir a secciones: #features, #testimonials, #contact -->
-                <a href="#features" class="nav-link">Características</a>
-                <a href="#testimonials" class="nav-link">Testimonios</a>
+             <div class="nav-links">
+                {% if data.features_raw and data.features_raw.strip() %}<a href="#features" class="nav-link">Características</a>{% endif %}
+                {% if data.testimonials_raw and data.testimonials_raw.strip() %}<a href="#testimonials" class="nav-link">Testimonios</a>{% endif %}
                 <a href="#contact" class="nav-link btn btn-secondary btn-sm">Contacto</a>
             </div>
         </div>
@@ -68,11 +113,12 @@
             {% endif %}
             {% if data.cta_text %}
                 <a href="#contact" class="btn btn-primary btn-lg cta-button">{{ data.cta_text }} <i class="fas fa-arrow-right"></i></a>
-                {# El href="#contact" es un ejemplo, podría ser un enlace externo #}
             {% endif %}
              <p class="page-type-badge">{{ data.page_type|capitalize }}</p>
         </div>
     </header>
+
+    <!-- ... (Resto de secciones: Features, Testimonials, CTA Secundario, Contacto - SIN CAMBIOS IMPORTANTES, verificar lógica `if` para secciones opcionales) ... -->
 
     <!-- Sección Características/Beneficios -->
     {% if data.features_raw and data.features_raw.strip() %}
@@ -86,13 +132,15 @@
                         {% set icon_class = parts[0].strip() | default('fa-solid fa-star') %}
                         {% set title = parts[1].strip() %}
                         {% set desc = parts[2].strip() %}
+                        {% if title and desc %} {# Solo mostrar si hay título y descripción #}
                         <div class="feature-item text-center">
                             <div class="feature-icon">
-                                <i class="fa-fw {{ icon_class }}"></i> {# fa-fw para ancho fijo #}
+                                <i class="fa-fw {{ icon_class }}"></i>
                             </div>
                             <h3 class="feature-title">{{ title }}</h3>
                             <p class="feature-description">{{ desc }}</p>
                         </div>
+                        {% endif %}
                     {% endif %}
                 {% endfor %}
             </div>
@@ -113,6 +161,7 @@
                         {% set author_parts = quote_parts[1].split(',', 1) %}
                         {% set author_name = author_parts[0].strip() %}
                         {% set author_title = author_parts[1].strip() if author_parts|length > 1 else '' %}
+                         {% if quote and author_name %} {# Solo mostrar si hay cita y autor #}
                         <div class="testimonial-item">
                             <blockquote class="testimonial-quote">
                                 <i class="fas fa-quote-left quote-icon"></i>
@@ -123,6 +172,7 @@
                                 {% if author_title %}<span class="author-title">{{ author_title }}</span>{% endif %}
                             </cite>
                         </div>
+                        {% endif %}
                     {% endif %}
                  {% endfor %}
             </div>
@@ -160,25 +210,27 @@
                             {% for link in data.social_links_raw.splitlines() %}
                                 {% set cleaned_link = link.strip() %}
                                 {% if cleaned_link %}
-                                    {% set platform_icon = 'fa-link' %} {# Icono por defecto #}
-                                    {% if 'linkedin.com' in cleaned_link %}{% set platform_icon = 'fa-linkedin' %}
-                                    {% elif 'twitter.com' in cleaned_link or 'x.com' in cleaned_link %}{% set platform_icon = 'fa-twitter' %}
-                                    {% elif 'github.com' in cleaned_link %}{% set platform_icon = 'fa-github' %}
-                                    {% elif 'instagram.com' in cleaned_link %}{% set platform_icon = 'fa-instagram' %}
-                                    {% elif 'facebook.com' in cleaned_link %}{% set platform_icon = 'fa-facebook' %}
+                                    {% set platform_icon = 'fa-link' %}
+                                    {% set brand_prefix = 'fas' %}
+                                    {% if 'linkedin.com' in cleaned_link %}{% set platform_icon = 'fa-linkedin' %}{% set brand_prefix = 'fab' %}
+                                    {% elif 'twitter.com' in cleaned_link or 'x.com' in cleaned_link %}{% set platform_icon = 'fa-twitter' %}{% set brand_prefix = 'fab' %}
+                                    {% elif 'github.com' in cleaned_link %}{% set platform_icon = 'fa-github' %}{% set brand_prefix = 'fab' %}
+                                    {% elif 'instagram.com' in cleaned_link %}{% set platform_icon = 'fa-instagram' %}{% set brand_prefix = 'fab' %}
+                                    {% elif 'facebook.com' in cleaned_link %}{% set platform_icon = 'fa-facebook' %}{% set brand_prefix = 'fab' %}
+                                    {% elif 'youtube.com' in cleaned_link %}{% set platform_icon = 'fa-youtube' %}{% set brand_prefix = 'fab' %}
+                                    {% elif 'behance.net' in cleaned_link %}{% set platform_icon = 'fa-behance' %}{% set brand_prefix = 'fab' %}
+                                    {% elif 'dribbble.com' in cleaned_link %}{% set platform_icon = 'fa-dribbble' %}{% set brand_prefix = 'fab' %}
                                     {% endif %}
-                                    <li><a href="{{ cleaned_link }}" target="_blank" rel="noopener noreferrer" title="Enlace a {{ platform_icon|replace('fa-', '')|capitalize }}"><i class="fab {{ platform_icon }} social-icon"></i></a></li>
+                                    <li><a href="{{ cleaned_link }}" target="_blank" rel="noopener noreferrer" title="Enlace a {{ platform_icon|replace('fa-', '')|capitalize }}"><i class="{{ brand_prefix }} {{ platform_icon }} social-icon"></i></a></li>
                                 {% endif %}
                             {% endfor %}
                         </ul>
                     {% endif %}
                 </div>
-                 <!-- Podría ir un formulario de contacto aquí en una versión más avanzada -->
                  <div class="contact-message">
-                     <h3>Envíanos un mensaje (Ejemplo)</h3>
-                     <p>Normalmente aquí iría un formulario, pero puedes contactarnos directamente usando la información proporcionada.</p>
-                     <!-- Placeholder para un mapa si fuera relevante -->
-                     <!-- <div class="map-placeholder">Mapa (Placeholder)</div> -->
+                     <h3>Envíanos un mensaje (Info)</h3>
+                     <p>Esta es una landing page generada. Para contactar, por favor utiliza la información de Email o Teléfono proporcionada.</p>
+                     <p><small>En una versión completa, aquí podría integrarse un formulario de contacto funcional.</small></p>
                  </div>
             </div>
         </div>
@@ -189,8 +241,9 @@
         <div class="container">
             <div class="footer-content">
                 <div class="footer-col footer-about">
-                     {% if data.logo_url %}
-                        <img src="{{ data.logo_url }}" alt="Logo de {{ data.name }}" class="footer-logo">
+                     <!-- *** USA logo_src *** -->
+                     {% if data.logo_src %}
+                        <img src="{{ data.logo_src }}" alt="Logo de {{ data.name }}" class="footer-logo">
                     {% else %}
                         <h4 class="footer-logo-text">{{ data.name }}</h4>
                     {% endif %}
@@ -199,12 +252,11 @@
                 <div class="footer-col footer-links">
                     <h4>Enlaces Rápidos</h4>
                     <ul>
-                        <li><a href="#features">Características</a></li>
-                        <li><a href="#testimonials">Testimonios</a></li>
+                         {% if data.features_raw and data.features_raw.strip() %}<li><a href="#features">Características</a></li>{% endif %}
+                         {% if data.testimonials_raw and data.testimonials_raw.strip() %}<li><a href="#testimonials">Testimonios</a></li>{% endif %}
                         <li><a href="#contact">Contacto</a></li>
-                        <!-- Placeholder Links -->
-                        <li><a href="#">Política de Privacidad</a></li>
-                        <li><a href="#">Términos de Servicio</a></li>
+                        <li><a href="#">Política de Privacidad (Ej.)</a></li>
+                        <li><a href="#">Términos de Servicio (Ej.)</a></li>
                     </ul>
                 </div>
                 <div class="footer-col footer-contact">
@@ -218,8 +270,7 @@
                 </div>
             </div>
             <div class="footer-bottom text-center">
-                <p>© {{ current_year }} {{ data.name }}. Todos los derechos reservados. Página generada por <a href="https://tu-dominio.com" target="_blank">Impulsa Landing</a>.</p>
-                 {# Reemplaza https://tu-dominio.com con el enlace real si lo tienes #}
+                <p>© {{ current_year }} {{ data.name }}. Todos los derechos reservados. Página generada por Impulsa Landing.</p>
             </div>
         </div>
     </footer>
