@@ -9,21 +9,17 @@
     {% if is_download %}<link rel="stylesheet" href="css/style.css">{% else %}<link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">{% endif %}
     <style>
         :root{--primary-color:{{data.color_primary|default('#007bff')}};--secondary-color:{{data.color_secondary|default('#ffffff')}};--primary-color-dark:color-mix(in srgb,var(--primary-color) 85%,black);--primary-color-light:color-mix(in srgb,var(--primary-color) 80%,white);}
-        /* Aplica fondo a la SECCIÓN hero, no necesariamente afecta al texto si hay imagen interna */
+        /* Aplica fondo a la SECCIÓN hero */
         .hero {
             {% if data.hero_background_type=='pattern' and data.hero_pattern_src %}
-                background-color: {{ data.color_primary }};
-                background-image: url('{{ data.hero_pattern_src }}');
+                background-color: {{ data.color_primary }}; background-image: url('{{ data.hero_pattern_src }}');
             {% elif data.hero_background_type=='gradient' and data.hero_background_css %}
                 background: {{ data.hero_background_css }};
-            {% elif data.hero_background_type=='color' and data.hero_background_css %}
-                background: {{ data.hero_background_css }};
-            {% else %}
-                /* Fallback o si es 'image_url' pero sin URL válida, usar color primario */
-                 background: {{ data.color_primary | default('#007bff') }};
+            {% else %} {# color or fallback #}
+                 background: {{ data.hero_background_css | default(data.color_primary | default('#007bff')) }};
             {% endif %}
 
-            /* Determinar color de texto base para la sección */
+            /* Determinar color de texto base para la sección (para texto fuera de hero-content si lo hubiera) */
             {% set text_color = '#ffffff' %} {# Default blanco #}
             {% if data.hero_background_type == 'color' and data.hero_background_css %}
                  {% set bg = data.hero_background_css %}
@@ -37,22 +33,23 @@
              {% endif %}
              color: {{ text_color }};
         }
-        /* Asegurar que el texto herede el color calculado si NO hay imagen externa */
-        {% if not data.image_hero_url %}
-        .hero .hero-content .headline, .hero .hero-content .description { color: inherit; }
-        {% else %}
-         /* Si HAY imagen externa, el texto podría necesitar un color específico
-            o confiar en el cálculo anterior si el fondo de la sección es visible */
-         .hero .hero-content .headline, .hero .hero-content .description { color: inherit; } /* O forzar un color: color: var(--heading-color); */
-        {% endif %}
+         /* El color del texto dentro de .hero-content puede necesitar sobreescribirse
+            especialmente si hay una imagen (`main_message_image_url`) presente,
+            porque el fondo de la sección podría no ser visible detrás del texto.
+            Por defecto, heredará el color calculado arriba. Ajustar en CSS si es necesario. */
+         .hero .hero-content .headline, .hero .hero-content .description {
+             /* Podríamos forzar un color aquí si la herencia no funciona bien con la imagen: */
+             /* color: var(--heading-color); */
+             color: inherit; /* Intenta heredar el color de la sección .hero */
+         }
 
     </style>
 </head>
-<body class="{{ 'hero-has-image' if data.image_hero_url else '' }}"> {# Clase para CSS si hay imagen junto al título #}
+<body class="{{ 'hero-has-image' if data.main_message_image_url else '' }}"> {# Clase si hay imagen junto al título #}
     {%if not is_download%}<div class="preview-controls"><div class="container"><span><i class="fas fa-eye"></i> Vista Previa</span><div><a href="/" class="btn btn-secondary btn-sm"><i class="fas fa-edit"></i> Editar</a><form action="{{url_for('download')}}" method="POST" class="download-form"><input type="hidden" name="page_data_json" value="{{data_json|escape}}"><button type="submit" class="btn btn-success btn-sm btn-download"><i class="fas fa-download"></i> Descargar (.zip)</button></form></div></div></div>{%endif%}
     <nav class="navbar"><div class="container"><div class="logo">{%if data.logo_src%}<img src="{{data.logo_src}}" alt="Logo {{data.name|default('Página')}}" class="logo-img">{%else%}<span class="logo-text">{{data.name|default('Mi Página')}}</span>{%endif%}</div><div class="nav-links">{%if data.features_raw and data.features_raw.strip()%}<a href="#features" class="nav-link">Características</a>{%endif%}{%if data.services_raw and data.services_raw.strip()%}<a href="#services" class="nav-link">Servicios</a>{%endif%}{%if data.portfolio_raw and data.portfolio_raw.strip()%}<a href="#portfolio" class="nav-link">Portafolio</a>{%endif%}{%if data.testimonials_raw and data.testimonials_raw.strip()%}<a href="#testimonials" class="nav-link">Testimonios</a>{%endif%}<a href="#contact" class="nav-link btn btn-secondary btn-sm">Contacto</a></div></div></nav>
 
-    <!-- ***** Sección Hero Modificada ***** -->
+    <!-- Sección Hero Modificada para imagen junto al título -->
     <header class="hero">
         <div class="container hero-container"> {# Contenedor Flex/Grid #}
             <div class="hero-content"> {# Contenido de texto #}
@@ -64,18 +61,15 @@
                     <a href="#contact" class="btn btn-primary btn-lg cta-button">{{ data.cta_text | default('Empezar') }} <i class="fas fa-arrow-right"></i></a>
                 {% endif %}
             </div>
-             {# Mostrar imagen solo si se proporcionó la URL #}
-            {% if data.image_hero_url %}
-                <div class="hero-image-wrapper">
-                    <img src="{{ data.image_hero_url }}" alt="Imagen de encabezado para {{ data.name|default('') }}" class="hero-image">
+             {# Mostrar imagen del mensaje principal SOLO si se proporcionó la URL #}
+            {% if data.main_message_image_url %}
+                <div class="hero-main-image-wrapper">
+                    <img src="{{ data.main_message_image_url }}" alt="Imagen principal para {{ data.name|default('') }}" class="hero-main-image">
                 </div>
             {% endif %}
         </div>
-        {# El badge puede ir aquí o dentro del container según preferencia de diseño #}
         <p class="page-type-badge">{{ data.page_type|capitalize }}</p>
     </header>
-    <!-- ***** Fin Sección Hero Modificada ***** -->
-
 
     <!-- Sección Características -->
     {%if data.features_raw and data.features_raw.strip()%}<section id="features" class="section features-section"><div class="container"><h2 class="section-title text-center">¿Por qué elegirnos?</h2><div class="features-grid">{%for l in data.features_raw.splitlines()%}{%set p=l.split(':',2)%}{%if p|length>=3%}{%set i=p[0].strip()|default('fa-solid fa-star')%}{%set t=p[1].strip()%}{%set d=p[2].strip()%}{%if t and d%}<div class="feature-item text-center"><div class="feature-icon"><i class="fa-fw {{i}}"></i></div><h3 class="feature-title">{{t}}</h3><p class="feature-description">{{d}}</p></div>{%endif%}{%endif%}{%endfor%}</div></div></section>{%endif%}
