@@ -19,7 +19,7 @@
                  background: {{ data.hero_background_css | default(data.color_primary | default('#007bff')) }};
             {% endif %}
 
-            /* Determinar color de texto base para la sección (para texto fuera de hero-content si lo hubiera) */
+            /* Determinar color de texto base para la sección */
             {% set text_color = '#ffffff' %} {# Default blanco #}
             {% if data.hero_background_type == 'color' and data.hero_background_css %}
                  {% set bg = data.hero_background_css %}
@@ -33,15 +33,17 @@
              {% endif %}
              color: {{ text_color }};
         }
-         /* El color del texto dentro de .hero-content puede necesitar sobreescribirse
-            especialmente si hay una imagen (`main_message_image_url`) presente,
-            porque el fondo de la sección podría no ser visible detrás del texto.
-            Por defecto, heredará el color calculado arriba. Ajustar en CSS si es necesario. */
+         /* Color texto hero-content */
          .hero .hero-content .headline, .hero .hero-content .description {
-             /* Podríamos forzar un color aquí si la herencia no funciona bien con la imagen: */
-             /* color: var(--heading-color); */
-             color: inherit; /* Intenta heredar el color de la sección .hero */
+             color: inherit; /* Hereda color sección por defecto */
          }
+         /* Ajuste si hay imagen y fondo sección es claro */
+         body.hero-has-image .hero[style*="color: rgb(51, 51, 51)"] .hero-content .headline,
+         body.hero-has-image .hero[style*="color: rgb(51, 51, 51)"] .hero-content .description {
+              color: var(--heading-color); /* Forzar oscuro */
+              text-shadow: 0 1px 1px rgba(255,255,255,0.4);
+         }
+         /* Ajuste si hay imagen y fondo sección es oscuro (ya hereda blanco/secundario, ok) */
 
     </style>
 </head>
@@ -49,19 +51,14 @@
     {%if not is_download%}<div class="preview-controls"><div class="container"><span><i class="fas fa-eye"></i> Vista Previa</span><div><a href="/" class="btn btn-secondary btn-sm"><i class="fas fa-edit"></i> Editar</a><form action="{{url_for('download')}}" method="POST" class="download-form"><input type="hidden" name="page_data_json" value="{{data_json|escape}}"><button type="submit" class="btn btn-success btn-sm btn-download"><i class="fas fa-download"></i> Descargar (.zip)</button></form></div></div></div>{%endif%}
     <nav class="navbar"><div class="container"><div class="logo">{%if data.logo_src%}<img src="{{data.logo_src}}" alt="Logo {{data.name|default('Página')}}" class="logo-img">{%else%}<span class="logo-text">{{data.name|default('Mi Página')}}</span>{%endif%}</div><div class="nav-links">{%if data.features_raw and data.features_raw.strip()%}<a href="#features" class="nav-link">Características</a>{%endif%}{%if data.services_raw and data.services_raw.strip()%}<a href="#services" class="nav-link">Servicios</a>{%endif%}{%if data.portfolio_raw and data.portfolio_raw.strip()%}<a href="#portfolio" class="nav-link">Portafolio</a>{%endif%}{%if data.testimonials_raw and data.testimonials_raw.strip()%}<a href="#testimonials" class="nav-link">Testimonios</a>{%endif%}<a href="#contact" class="nav-link btn btn-secondary btn-sm">Contacto</a></div></div></nav>
 
-    <!-- Sección Hero Modificada para imagen junto al título -->
+    <!-- Sección Hero -->
     <header class="hero">
-        <div class="container hero-container"> {# Contenedor Flex/Grid #}
-            <div class="hero-content"> {# Contenido de texto #}
+        <div class="container hero-container">
+            <div class="hero-content">
                 <h1 class="headline">{{ data.headline | default('Increíble Propuesta de Valor Aquí') }}</h1>
-                {% if data.description %}
-                    <p class="description lead">{{ data.description }}</p>
-                {% endif %}
-                {% if data.cta_text %}
-                    <a href="#contact" class="btn btn-primary btn-lg cta-button">{{ data.cta_text | default('Empezar') }} <i class="fas fa-arrow-right"></i></a>
-                {% endif %}
+                {% if data.description %} <p class="description lead">{{ data.description }}</p> {% endif %}
+                {% if data.cta_text %} <a href="#contact" class="btn btn-primary btn-lg cta-button">{{ data.cta_text | default('Empezar') }} <i class="fas fa-arrow-right"></i></a> {% endif %}
             </div>
-             {# Mostrar imagen del mensaje principal SOLO si se proporcionó la URL #}
             {% if data.main_message_image_url %}
                 <div class="hero-main-image-wrapper">
                     <img src="{{ data.main_message_image_url }}" alt="Imagen principal para {{ data.name|default('') }}" class="hero-main-image">
@@ -86,8 +83,16 @@
     <!-- Sección CTA Secundaria -->
     <section class="section cta-secondary-section text-center"><div class="container"><h2 class="section-title">¿Listo para Empezar?</h2><p class="lead">Impulsa tu presencia online ahora.</p>{%if data.cta_text%}<a href="#contact" class="btn btn-primary btn-lg cta-button">{{data.cta_text|default('Empezar')}} Ahora</a>{%endif%}</div></section>
 
-    <!-- Sección Contacto -->
-    <section id="contact" class="section contact-section section-bg"><div class="container"><h2 class="section-title text-center">Contacto</h2><div class="contact-grid"><div class="contact-info"><h3>Detalles</h3>{%if data.contact_email%}<p><i class="fas fa-envelope fa-fw contact-icon"></i> <a href="mailto:{{data.contact_email}}">{{data.contact_email}}</a></p>{%endif%}{%if data.contact_phone%}<p><i class="fas fa-phone fa-fw contact-icon"></i> {{data.contact_phone}}</p>{%endif%}{%if data.social_links_raw and data.social_links_raw.strip()%}<h3 class="social-title">Síguenos</h3><ul class="social-links-list">{%for l in data.social_links_raw.splitlines()%}{%set cl=l.strip()%}{%if cl%}{%set pi='fa-link'%}{%set bp='fas'%}{%if'linkedin.com'in cl%}{%set pi='fa-linkedin'%}{%set bp='fab'%}{%elif'twitter.com'in cl or'x.com'in cl%}{%set pi='fa-x-twitter'%}{%set bp='fab'%}{%elif'github.com'in cl%}{%set pi='fa-github'%}{%set bp='fab'%}{%elif'instagram.com'in cl%}{%set pi='fa-instagram'%}{%set bp='fab'%}{%elif'facebook.com'in cl%}{%set pi='fa-facebook'%}{%set bp='fab'%}{%elif'youtube.com'in cl%}{%set pi='fa-youtube'%}{%set bp='fab'%}{%elif'behance.net'in cl%}{%set pi='fa-behance'%}{%set bp='fab'%}{%elif'dribbble.com'in cl%}{%set pi='fa-dribbble'%}{%set bp='fab'%}{%elif'tiktok.com'in cl%}{%set pi='fa-tiktok'%}{%set bp='fab'%}{%elif'pinterest.com'in cl%}{%set pi='fa-pinterest'%}{%set bp='fab'%}{%endif%}<li><a href="{{cl}}" target="_blank" rel="noopener noreferrer" aria-label="{{pi|replace('fa-','')|capitalize}}" title="{{pi|replace('fa-','')|capitalize}}"><i class="{{bp}} {{pi}} social-icon"></i></a></li>{%endif%}{%endfor%}</ul>{%endif%}</div><div class="contact-message"><h3>Envíanos un Mensaje (Info)</h3><p>Contacta usando la información proporcionada.</p><p><small>Aquí podría ir un formulario.</small></p></div></div></div></section>
+    <!-- Sección Contacto (Texto Modificado) -->
+    <section id="contact" class="section contact-section section-bg"><div class="container"><h2 class="section-title text-center">Contacto</h2><div class="contact-grid"><div class="contact-info"><h3>Detalles</h3>{%if data.contact_email%}<p><i class="fas fa-envelope fa-fw contact-icon"></i> <a href="mailto:{{data.contact_email}}">{{data.contact_email}}</a></p>{%endif%}{%if data.contact_phone%}<p><i class="fas fa-phone fa-fw contact-icon"></i> {{data.contact_phone}}</p>{%endif%}{%if data.social_links_raw and data.social_links_raw.strip()%}<h3 class="social-title">Síguenos</h3><ul class="social-links-list">{%for l in data.social_links_raw.splitlines()%}{%set cl=l.strip()%}{%if cl%}{%set pi='fa-link'%}{%set bp='fas'%}{%if'linkedin.com'in cl%}{%set pi='fa-linkedin'%}{%set bp='fab'%}{%elif'twitter.com'in cl or'x.com'in cl%}{%set pi='fa-x-twitter'%}{%set bp='fab'%}{%elif'github.com'in cl%}{%set pi='fa-github'%}{%set bp='fab'%}{%elif'instagram.com'in cl%}{%set pi='fa-instagram'%}{%set bp='fab'%}{%elif'facebook.com'in cl%}{%set pi='fa-facebook'%}{%set bp='fab'%}{%elif'youtube.com'in cl%}{%set pi='fa-youtube'%}{%set bp='fab'%}{%elif'behance.net'in cl%}{%set pi='fa-behance'%}{%set bp='fab'%}{%elif'dribbble.com'in cl%}{%set pi='fa-dribbble'%}{%set bp='fab'%}{%elif'tiktok.com'in cl%}{%set pi='fa-tiktok'%}{%set bp='fab'%}{%elif'pinterest.com'in cl%}{%set pi='fa-pinterest'%}{%set bp='fab'%}{%endif%}<li><a href="{{cl}}" target="_blank" rel="noopener noreferrer" aria-label="{{pi|replace('fa-','')|capitalize}}" title="{{pi|replace('fa-','')|capitalize}}"><i class="{{bp}} {{pi}} social-icon"></i></a></li>{%endif%}{%endfor%}</ul>{%endif%}</div>
+                 <div class="contact-message">
+                     <!-- ***** TEXTO CAMBIADO AQUÍ ***** -->
+                     <h3>Envíanos un mensaje</h3>
+                     <p>Contacta usando la información proporcionada.</p>
+                     <!-- ***** FIN TEXTO CAMBIADO ***** -->
+                 </div>
+            </div></div>
+    </section>
 
     <!-- Footer -->
     <footer class="footer"><div class="container"><div class="footer-content"><div class="footer-col footer-about">{%if data.logo_src%}<img src="{{data.logo_src}}" alt="Logo {{data.name|default('Página')}}" class="footer-logo">{%else%}<h4 class="footer-logo-text">{{data.name|default('Mi Página')}}</h4>{%endif%}<p class="footer-tagline">{{data.headline|truncate(70)}}</p></div><div class="footer-col footer-links"><h4>Enlaces</h4><ul>{%if data.features_raw and data.features_raw.strip()%}<li><a href="#features">Características</a></li>{%endif%}{%if data.services_raw and data.services_raw.strip()%}<li><a href="#services">Servicios</a></li>{%endif%}{%if data.portfolio_raw and data.portfolio_raw.strip()%}<li><a href="#portfolio">Portafolio</a></li>{%endif%}{%if data.testimonials_raw and data.testimonials_raw.strip()%}<li><a href="#testimonials">Testimonios</a></li>{%endif%}<li><a href="#contact">Contacto</a></li><li><a href="#">Privacidad (Ej.)</a></li></ul></div><div class="footer-col footer-contact"><h4>Contacto Rápido</h4>{%if data.contact_email%}<p><i class="fas fa-envelope fa-fw"></i> <a href="mailto:{{data.contact_email}}">{{data.contact_email}}</a></p>{%endif%}{%if data.contact_phone%}<p><i class="fas fa-phone fa-fw"></i> {{data.contact_phone}}</p>{%endif%}</div></div><div class="footer-bottom text-center"><p>© {{current_year}} {{data.name|default('Tu Nombre/Empresa')}}. Generado por Impulsa Landing.</p></div></div></footer>
