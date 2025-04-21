@@ -7,70 +7,93 @@
     <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" integrity="sha512-iecdLmaskl7CVkqkXNQ/ZH/XLlvWZOJyj7Yy7tcenmpD1ypASozpmT/E0iPtmFIB46ZmdtAc9eNBvH0H/ZpiBw==" crossorigin="anonymous" referrerpolicy="no-referrer" />
     {% if is_download %}<link rel="stylesheet" href="css/style.css">{% else %}<link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">{% endif %}
-    <style>:root{--primary-color:{{data.color_primary|default('#007bff')}};--secondary-color:{{data.color_secondary|default('#ffffff')}};--primary-color-dark:color-mix(in srgb,var(--primary-color) 85%,black);--primary-color-light:color-mix(in srgb,var(--primary-color) 80%,white);}.hero{%if data.hero_background_type=='pattern' and data.hero_pattern_src%}background-color:{{data.color_primary}};background-image:url('{{data.hero_pattern_src}}');color:var(--secondary-color);{%elif data.hero_background_type=='gradient' and data.hero_background_css%}background:{{data.hero_background_css}};color:var(--white);{%elif data.hero_background_type=='image_url' and data.image_hero_url%}background-image:linear-gradient(rgba(0,0,0,0.5),rgba(0,0,0,0.5)),url('{{data.image_hero_url|escape}}');background-size:cover;background-position:center center;color:#ffffff;{%elif data.hero_background_type=='color' and data.hero_background_css%}background:{{data.hero_background_css}};{%set bg=data.hero_background_css%}{%set r=(bg[1:3]|int(base=16))if bg and bg.startswith('#')and bg|length==7 else 0%}{%set g=(bg[3:5]|int(base=16))if bg and bg.startswith('#')and bg|length==7 else 0%}{%set b=(bg[5:7]|int(base=16))if bg and bg.startswith('#')and bg|length==7 else 0%}{%set l=(0.299*r+0.587*g+0.114*b)/255 if r!=0 or g!=0 or b!=0 else 0%}color:{{'#333333'if l>0.5 else'#ffffff'}};{%else%}background:var(--primary-color);color:var(--white);{%endif%}{%if data.hero_background_type!='image_url'%}.hero .headline,.hero .description{color:inherit;}{%endif%}</style>
+    <style>
+        :root{--primary-color:{{data.color_primary|default('#007bff')}};--secondary-color:{{data.color_secondary|default('#ffffff')}};--primary-color-dark:color-mix(in srgb,var(--primary-color) 85%,black);--primary-color-light:color-mix(in srgb,var(--primary-color) 80%,white);}
+        /* Aplica fondo a la SECCIÓN hero, no necesariamente afecta al texto si hay imagen interna */
+        .hero {
+            {% if data.hero_background_type=='pattern' and data.hero_pattern_src %}
+                background-color: {{ data.color_primary }};
+                background-image: url('{{ data.hero_pattern_src }}');
+            {% elif data.hero_background_type=='gradient' and data.hero_background_css %}
+                background: {{ data.hero_background_css }};
+            {% elif data.hero_background_type=='color' and data.hero_background_css %}
+                background: {{ data.hero_background_css }};
+            {% else %}
+                /* Fallback o si es 'image_url' pero sin URL válida, usar color primario */
+                 background: {{ data.color_primary | default('#007bff') }};
+            {% endif %}
+
+            /* Determinar color de texto base para la sección */
+            {% set text_color = '#ffffff' %} {# Default blanco #}
+            {% if data.hero_background_type == 'color' and data.hero_background_css %}
+                 {% set bg = data.hero_background_css %}
+                 {% set r=(bg[1:3]|int(base=16))if bg and bg.startswith('#')and bg|length==7 else 0 %}
+                 {% set g=(bg[3:5]|int(base=16))if bg and bg.startswith('#')and bg|length==7 else 0 %}
+                 {% set b=(bg[5:7]|int(base=16))if bg and bg.startswith('#')and bg|length==7 else 0 %}
+                 {% set l=(0.299*r+0.587*g+0.114*b)/255 if r!=0 or g!=0 or b!=0 else 0 %}
+                 {% set text_color = '#333333' if l > 0.5 else '#ffffff' %}
+             {% elif data.hero_background_type == 'pattern' %}
+                 {% set text_color = data.color_secondary | default('#ffffff') %}
+             {% endif %}
+             color: {{ text_color }};
+        }
+        /* Asegurar que el texto herede el color calculado si NO hay imagen externa */
+        {% if not data.image_hero_url %}
+        .hero .hero-content .headline, .hero .hero-content .description { color: inherit; }
+        {% else %}
+         /* Si HAY imagen externa, el texto podría necesitar un color específico
+            o confiar en el cálculo anterior si el fondo de la sección es visible */
+         .hero .hero-content .headline, .hero .hero-content .description { color: inherit; } /* O forzar un color: color: var(--heading-color); */
+        {% endif %}
+
+    </style>
 </head>
-<body class="{{'hero-has-image-url' if data.hero_background_type=='image_url' and data.image_hero_url else ''}}">
-    {%if not is_download%}<div class="preview-controls"><div class="container"><span><i class="fas fa-eye"></i> Modo Vista Previa</span><div><a href="/" class="btn btn-secondary btn-sm"><i class="fas fa-edit"></i> Editar</a><form action="{{url_for('download')}}" method="POST" class="download-form"><input type="hidden" name="page_data_json" value="{{data_json|escape}}"><button type="submit" class="btn btn-success btn-sm btn-download"><i class="fas fa-download"></i> Descargar (.zip)</button></form></div></div></div>{%endif%}
+<body class="{{ 'hero-has-image' if data.image_hero_url else '' }}"> {# Clase para CSS si hay imagen junto al título #}
+    {%if not is_download%}<div class="preview-controls"><div class="container"><span><i class="fas fa-eye"></i> Vista Previa</span><div><a href="/" class="btn btn-secondary btn-sm"><i class="fas fa-edit"></i> Editar</a><form action="{{url_for('download')}}" method="POST" class="download-form"><input type="hidden" name="page_data_json" value="{{data_json|escape}}"><button type="submit" class="btn btn-success btn-sm btn-download"><i class="fas fa-download"></i> Descargar (.zip)</button></form></div></div></div>{%endif%}
     <nav class="navbar"><div class="container"><div class="logo">{%if data.logo_src%}<img src="{{data.logo_src}}" alt="Logo {{data.name|default('Página')}}" class="logo-img">{%else%}<span class="logo-text">{{data.name|default('Mi Página')}}</span>{%endif%}</div><div class="nav-links">{%if data.features_raw and data.features_raw.strip()%}<a href="#features" class="nav-link">Características</a>{%endif%}{%if data.services_raw and data.services_raw.strip()%}<a href="#services" class="nav-link">Servicios</a>{%endif%}{%if data.portfolio_raw and data.portfolio_raw.strip()%}<a href="#portfolio" class="nav-link">Portafolio</a>{%endif%}{%if data.testimonials_raw and data.testimonials_raw.strip()%}<a href="#testimonials" class="nav-link">Testimonios</a>{%endif%}<a href="#contact" class="nav-link btn btn-secondary btn-sm">Contacto</a></div></div></nav>
-    <header class="hero"><div class="container text-center"><h1 class="headline">{{data.headline|default('Increíble Propuesta de Valor Aquí')}}</h1>{%if data.description%}<p class="description lead">{{data.description}}</p>{%endif%}{%if data.cta_text%}<a href="#contact" class="btn btn-primary btn-lg cta-button">{{data.cta_text|default('Empezar')}} <i class="fas fa-arrow-right"></i></a>{%endif%}<p class="page-type-badge">{{data.page_type|capitalize}}</p></div></header>
+
+    <!-- ***** Sección Hero Modificada ***** -->
+    <header class="hero">
+        <div class="container hero-container"> {# Contenedor Flex/Grid #}
+            <div class="hero-content"> {# Contenido de texto #}
+                <h1 class="headline">{{ data.headline | default('Increíble Propuesta de Valor Aquí') }}</h1>
+                {% if data.description %}
+                    <p class="description lead">{{ data.description }}</p>
+                {% endif %}
+                {% if data.cta_text %}
+                    <a href="#contact" class="btn btn-primary btn-lg cta-button">{{ data.cta_text | default('Empezar') }} <i class="fas fa-arrow-right"></i></a>
+                {% endif %}
+            </div>
+             {# Mostrar imagen solo si se proporcionó la URL #}
+            {% if data.image_hero_url %}
+                <div class="hero-image-wrapper">
+                    <img src="{{ data.image_hero_url }}" alt="Imagen de encabezado para {{ data.name|default('') }}" class="hero-image">
+                </div>
+            {% endif %}
+        </div>
+        {# El badge puede ir aquí o dentro del container según preferencia de diseño #}
+        <p class="page-type-badge">{{ data.page_type|capitalize }}</p>
+    </header>
+    <!-- ***** Fin Sección Hero Modificada ***** -->
+
 
     <!-- Sección Características -->
     {%if data.features_raw and data.features_raw.strip()%}<section id="features" class="section features-section"><div class="container"><h2 class="section-title text-center">¿Por qué elegirnos?</h2><div class="features-grid">{%for l in data.features_raw.splitlines()%}{%set p=l.split(':',2)%}{%if p|length>=3%}{%set i=p[0].strip()|default('fa-solid fa-star')%}{%set t=p[1].strip()%}{%set d=p[2].strip()%}{%if t and d%}<div class="feature-item text-center"><div class="feature-icon"><i class="fa-fw {{i}}"></i></div><h3 class="feature-title">{{t}}</h3><p class="feature-description">{{d}}</p></div>{%endif%}{%endif%}{%endfor%}</div></div></section>{%endif%}
 
     <!-- Sección Servicios -->
-    {% if data.services_raw and data.services_raw.strip() %}
-    <section id="services" class="section services-section {% if not (data.features_raw and data.features_raw.strip()) %}section-bg{% endif %}">
-        <div class="container">
-            <h2 class="section-title text-center">Nuestros Servicios</h2>
-            <div class="services-grid">
-                {% for service_line in data.services_raw.splitlines() %}
-                    {% set parts = service_line.split(':', 2) %}
-                    {% if parts|length >= 3 %}
-                        {% set icon_class = parts[0].strip() | default('fa-solid fa-gear') %}
-                        {% set title = parts[1].strip() %}
-                        {% set desc = parts[2].strip() %}
-                        {% if title and desc %}
-                        <div class="service-item">
-                            <div class="service-icon">
-                                <i class="fa-fw {{ icon_class }}"></i>
-                            </div>
-                            <div class="service-content">
-                                <h3 class="service-title">{{ title }}</h3>
-                                <p class="service-description">{{ desc }}</p>
-                            </div>
-                        </div>
-                        {% endif %}
-                    {% endif %}
-                {% endfor %}
-            </div>
-        </div>
-    </section>
-    {% endif %}
+    {% if data.services_raw and data.services_raw.strip() %}<section id="services" class="section services-section {% if not (data.features_raw and data.features_raw.strip()) %}section-bg{% endif %}"><div class="container"><h2 class="section-title text-center">Nuestros Servicios</h2><div class="services-grid">{% for service_line in data.services_raw.splitlines() %}{% set parts = service_line.split(':', 2) %}{% if parts|length >= 3 %}{% set icon_class = parts[0].strip() | default('fa-solid fa-gear') %}{% set title = parts[1].strip() %}{% set desc = parts[2].strip() %}{% if title and desc %}<div class="service-item"><div class="service-icon"><i class="fa-fw {{ icon_class }}"></i></div><div class="service-content"><h3 class="service-title">{{ title }}</h3><p class="service-description">{{ desc }}</p></div></div>{% endif %}{% endif %}{% endfor %}</div></div></section>{% endif %}
 
     <!-- Sección Portafolio -->
-    {% if data.portfolio_raw and data.portfolio_raw.strip() %}
-    <section id="portfolio" class="section portfolio-section {% if not (data.services_raw and data.services_raw.strip()) and not (data.features_raw and data.features_raw.strip()) %}section-bg{% elif (data.services_raw and data.services_raw.strip()) and (data.features_raw and data.features_raw.strip()) %}section-bg{% endif %}">
-        <div class="container">
-            <h2 class="section-title text-center">Nuestro Trabajo / Proyectos</h2>
-            <div class="portfolio-grid">
-                {% for item_line in data.portfolio_raw.splitlines() %}{%set p=item_line.split('|',3)%}{%if p|length>=3%}{%set img=p[0].strip()%}{%set t=p[1].strip()%}{%set d=p[2].strip()%}{%set link=p[3].strip()if p|length>=4 else None%}{%if img and t and d%}<div class="portfolio-item"><div class="portfolio-image"><img src="{{img}}" alt="{{t}}" loading="lazy"></div><div class="portfolio-content"><h3 class="portfolio-title">{{t}}</h3><p class="portfolio-description">{{d}}</p>{%if link%}<a href="{{link}}" target="_blank" rel="noopener noreferrer" class="btn btn-secondary btn-sm portfolio-link">Ver Proyecto <i class="fas fa-external-link-alt fa-xs"></i></a>{%endif%}</div></div>{%endif%}{%endif%}{%endfor%}
-            </div>
-        </div>
-    </section>
-    {% endif %}
+    {% if data.portfolio_raw and data.portfolio_raw.strip() %}<section id="portfolio" class="section portfolio-section {% if not (data.services_raw and data.services_raw.strip()) and not (data.features_raw and data.features_raw.strip()) %}section-bg{% elif (data.services_raw and data.services_raw.strip()) and (data.features_raw and data.features_raw.strip()) %}section-bg{% endif %}"><div class="container"><h2 class="section-title text-center">Nuestro Trabajo</h2><div class="portfolio-grid">{% for item_line in data.portfolio_raw.splitlines() %}{%set p=item_line.split('|',3)%}{%if p|length>=3%}{%set img=p[0].strip()%}{%set t=p[1].strip()%}{%set d=p[2].strip()%}{%set link=p[3].strip()if p|length>=4 else None%}{%if img and t and d%}<div class="portfolio-item"><div class="portfolio-image"><img src="{{img}}" alt="{{t}}" loading="lazy"></div><div class="portfolio-content"><h3 class="portfolio-title">{{t}}</h3><p class="portfolio-description">{{d}}</p>{%if link%}<a href="{{link}}" target="_blank" rel="noopener noreferrer" class="btn btn-secondary btn-sm portfolio-link">Ver Proyecto <i class="fas fa-external-link-alt fa-xs"></i></a>{%endif%}</div></div>{%endif%}{%endif%}{%endfor%}</div></div></section>{% endif %}
 
     <!-- Sección Testimonios -->
-    {% if data.testimonials_raw and data.testimonials_raw.strip() %}
-    <section id="testimonials" class="section testimonials-section {% if not (data.portfolio_raw and data.portfolio_raw.strip()) and not (data.services_raw and data.services_raw.strip()) and not (data.features_raw and data.features_raw.strip()) %}section-bg{% elif (data.portfolio_raw and data.portfolio_raw.strip()) and (data.services_raw and data.services_raw.strip()) and not (data.features_raw and data.features_raw.strip()) %}section-bg{% elif (data.portfolio_raw and data.portfolio_raw.strip()) and not (data.services_raw and data.services_raw.strip()) and (data.features_raw and data.features_raw.strip()) %}section-bg{% elif not (data.portfolio_raw and data.portfolio_raw.strip()) and (data.services_raw and data.services_raw.strip()) and (data.features_raw and data.features_raw.strip()) %}section-bg{% endif %}">
-        <div class="container"><h2 class="section-title text-center">Lo que dicen de nosotros</h2><div class="testimonials-grid">{%for l in data.testimonials_raw.splitlines()%}{%set qp=l.split('-',1)%}{%if qp|length>=2%}{%set q=qp[0].strip().strip('"')%}{%set ap=qp[1].split(',',1)%}{%set an=ap[0].strip()%}{%set at=ap[1].strip()if ap|length>1 else''%}{%if q and an%}<div class="testimonial-item"><blockquote class="testimonial-quote"><i class="fas fa-quote-left quote-icon"></i>{{q}}</blockquote><cite class="testimonial-author"><span class="author-name">{{an}}</span>{%if at%}<span class="author-title">{{at}}</span>{%endif%}</cite></div>{%endif%}{%endif%}{%endfor%}</div></div>
-    </section>
-    {% endif %}
+    {% if data.testimonials_raw and data.testimonials_raw.strip() %}<section id="testimonials" class="section testimonials-section {% if not (data.portfolio_raw and data.portfolio_raw.strip()) and not (data.services_raw and data.services_raw.strip()) and not (data.features_raw and data.features_raw.strip()) %}section-bg{% elif (data.portfolio_raw and data.portfolio_raw.strip()) and (data.services_raw and data.services_raw.strip()) and not (data.features_raw and data.features_raw.strip()) %}section-bg{% elif (data.portfolio_raw and data.portfolio_raw.strip()) and not (data.services_raw and data.services_raw.strip()) and (data.features_raw and data.features_raw.strip()) %}section-bg{% elif not (data.portfolio_raw and data.portfolio_raw.strip()) and (data.services_raw and data.services_raw.strip()) and (data.features_raw and data.features_raw.strip()) %}section-bg{% endif %}"><div class="container"><h2 class="section-title text-center">Lo que dicen</h2><div class="testimonials-grid">{%for l in data.testimonials_raw.splitlines()%}{%set qp=l.split('-',1)%}{%if qp|length>=2%}{%set q=qp[0].strip().strip('"')%}{%set ap=qp[1].split(',',1)%}{%set an=ap[0].strip()%}{%set at=ap[1].strip()if ap|length>1 else''%}{%if q and an%}<div class="testimonial-item"><blockquote class="testimonial-quote"><i class="fas fa-quote-left quote-icon"></i>{{q}}</blockquote><cite class="testimonial-author"><span class="author-name">{{an}}</span>{%if at%}<span class="author-title">{{at}}</span>{%endif%}</cite></div>{%endif%}{%endif%}{%endfor%}</div></div></section>{% endif %}
 
     <!-- Sección CTA Secundaria -->
     <section class="section cta-secondary-section text-center"><div class="container"><h2 class="section-title">¿Listo para Empezar?</h2><p class="lead">Impulsa tu presencia online ahora.</p>{%if data.cta_text%}<a href="#contact" class="btn btn-primary btn-lg cta-button">{{data.cta_text|default('Empezar')}} Ahora</a>{%endif%}</div></section>
 
     <!-- Sección Contacto -->
-    <section id="contact" class="section contact-section section-bg"><div class="container"><h2 class="section-title text-center">Ponte en Contacto</h2><div class="contact-grid"><div class="contact-info"><h3>Detalles</h3>{%if data.contact_email%}<p><i class="fas fa-envelope fa-fw contact-icon"></i> <a href="mailto:{{data.contact_email}}">{{data.contact_email}}</a></p>{%endif%}{%if data.contact_phone%}<p><i class="fas fa-phone fa-fw contact-icon"></i> {{data.contact_phone}}</p>{%endif%}{%if data.social_links_raw and data.social_links_raw.strip()%}<h3 class="social-title">Síguenos</h3><ul class="social-links-list">{%for l in data.social_links_raw.splitlines()%}{%set cl=l.strip()%}{%if cl%}{%set pi='fa-link'%}{%set bp='fas'%}{%if'linkedin.com'in cl%}{%set pi='fa-linkedin'%}{%set bp='fab'%}{%elif'twitter.com'in cl or'x.com'in cl%}{%set pi='fa-x-twitter'%}{%set bp='fab'%}{%elif'github.com'in cl%}{%set pi='fa-github'%}{%set bp='fab'%}{%elif'instagram.com'in cl%}{%set pi='fa-instagram'%}{%set bp='fab'%}{%elif'facebook.com'in cl%}{%set pi='fa-facebook'%}{%set bp='fab'%}{%elif'youtube.com'in cl%}{%set pi='fa-youtube'%}{%set bp='fab'%}{%elif'behance.net'in cl%}{%set pi='fa-behance'%}{%set bp='fab'%}{%elif'dribbble.com'in cl%}{%set pi='fa-dribbble'%}{%set bp='fab'%}{%elif'tiktok.com'in cl%}{%set pi='fa-tiktok'%}{%set bp='fab'%}{%elif'pinterest.com'in cl%}{%set pi='fa-pinterest'%}{%set bp='fab'%}{%endif%}<li><a href="{{cl}}" target="_blank" rel="noopener noreferrer" aria-label="{{pi|replace('fa-','')|capitalize}}" title="{{pi|replace('fa-','')|capitalize}}"><i class="{{bp}} {{pi}} social-icon"></i></a></li>{%endif%}{%endfor%}</ul>{%endif%}</div><div class="contact-message"><h3>Envíanos un Mensaje (Info)</h3><p>Contacta usando la información proporcionada.</p><p><small>Aquí podría ir un formulario de contacto.</small></p></div></div></div></section>
+    <section id="contact" class="section contact-section section-bg"><div class="container"><h2 class="section-title text-center">Contacto</h2><div class="contact-grid"><div class="contact-info"><h3>Detalles</h3>{%if data.contact_email%}<p><i class="fas fa-envelope fa-fw contact-icon"></i> <a href="mailto:{{data.contact_email}}">{{data.contact_email}}</a></p>{%endif%}{%if data.contact_phone%}<p><i class="fas fa-phone fa-fw contact-icon"></i> {{data.contact_phone}}</p>{%endif%}{%if data.social_links_raw and data.social_links_raw.strip()%}<h3 class="social-title">Síguenos</h3><ul class="social-links-list">{%for l in data.social_links_raw.splitlines()%}{%set cl=l.strip()%}{%if cl%}{%set pi='fa-link'%}{%set bp='fas'%}{%if'linkedin.com'in cl%}{%set pi='fa-linkedin'%}{%set bp='fab'%}{%elif'twitter.com'in cl or'x.com'in cl%}{%set pi='fa-x-twitter'%}{%set bp='fab'%}{%elif'github.com'in cl%}{%set pi='fa-github'%}{%set bp='fab'%}{%elif'instagram.com'in cl%}{%set pi='fa-instagram'%}{%set bp='fab'%}{%elif'facebook.com'in cl%}{%set pi='fa-facebook'%}{%set bp='fab'%}{%elif'youtube.com'in cl%}{%set pi='fa-youtube'%}{%set bp='fab'%}{%elif'behance.net'in cl%}{%set pi='fa-behance'%}{%set bp='fab'%}{%elif'dribbble.com'in cl%}{%set pi='fa-dribbble'%}{%set bp='fab'%}{%elif'tiktok.com'in cl%}{%set pi='fa-tiktok'%}{%set bp='fab'%}{%elif'pinterest.com'in cl%}{%set pi='fa-pinterest'%}{%set bp='fab'%}{%endif%}<li><a href="{{cl}}" target="_blank" rel="noopener noreferrer" aria-label="{{pi|replace('fa-','')|capitalize}}" title="{{pi|replace('fa-','')|capitalize}}"><i class="{{bp}} {{pi}} social-icon"></i></a></li>{%endif%}{%endfor%}</ul>{%endif%}</div><div class="contact-message"><h3>Envíanos un Mensaje (Info)</h3><p>Contacta usando la información proporcionada.</p><p><small>Aquí podría ir un formulario.</small></p></div></div></div></section>
 
     <!-- Footer -->
     <footer class="footer"><div class="container"><div class="footer-content"><div class="footer-col footer-about">{%if data.logo_src%}<img src="{{data.logo_src}}" alt="Logo {{data.name|default('Página')}}" class="footer-logo">{%else%}<h4 class="footer-logo-text">{{data.name|default('Mi Página')}}</h4>{%endif%}<p class="footer-tagline">{{data.headline|truncate(70)}}</p></div><div class="footer-col footer-links"><h4>Enlaces</h4><ul>{%if data.features_raw and data.features_raw.strip()%}<li><a href="#features">Características</a></li>{%endif%}{%if data.services_raw and data.services_raw.strip()%}<li><a href="#services">Servicios</a></li>{%endif%}{%if data.portfolio_raw and data.portfolio_raw.strip()%}<li><a href="#portfolio">Portafolio</a></li>{%endif%}{%if data.testimonials_raw and data.testimonials_raw.strip()%}<li><a href="#testimonials">Testimonios</a></li>{%endif%}<li><a href="#contact">Contacto</a></li><li><a href="#">Privacidad (Ej.)</a></li></ul></div><div class="footer-col footer-contact"><h4>Contacto Rápido</h4>{%if data.contact_email%}<p><i class="fas fa-envelope fa-fw"></i> <a href="mailto:{{data.contact_email}}">{{data.contact_email}}</a></p>{%endif%}{%if data.contact_phone%}<p><i class="fas fa-phone fa-fw"></i> {{data.contact_phone}}</p>{%endif%}</div></div><div class="footer-bottom text-center"><p>© {{current_year}} {{data.name|default('Tu Nombre/Empresa')}}. Generado por Impulsa Landing.</p></div></div></footer>
