@@ -9,7 +9,7 @@
     {% if is_download %}<link rel="stylesheet" href="css/style.css">{% else %}<link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">{% endif %}
     <style>
         :root{--primary-color:{{data.color_primary|default('#007bff')}};--secondary-color:{{data.color_secondary|default('#ffffff')}};--primary-color-dark:color-mix(in srgb,var(--primary-color) 85%,black);--primary-color-light:color-mix(in srgb,var(--primary-color) 80%,white);}
-        /* Aplica fondo a la SECCIÓN hero */
+        /* Aplica fondo a la SECCIÓN hero */ 
         .hero {
             {% if data.hero_background_type=='pattern' and data.hero_pattern_src %}
                 background-color: {{ data.color_primary }}; background-image: url('{{ data.hero_pattern_src }}');
