@@ -9,7 +9,7 @@
     {% if is_download %}<link rel="stylesheet" href="css/style.css">{% else %}<link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">{% endif %}
     <style>
         :root{--primary-color:{{data.color_primary|default('#007bff')}};--secondary-color:{{data.color_secondary|default('#ffffff')}};--primary-color-dark:color-mix(in srgb,var(--primary-color) 85%,black);--primary-color-light:color-mix(in srgb,var(--primary-color) 80%,white);}
-        /* Aplica fondo a la SECCIÓN hero */ 
+        /* Aplica fondo a la SECCIÓN hero */
         .hero {
             {% if data.hero_background_type=='pattern' and data.hero_pattern_src %}
                 background-color: {{ data.color_primary }}; background-image: url('{{ data.hero_pattern_src }}');
@@ -86,10 +86,10 @@
     <!-- Sección Contacto (Texto Modificado) -->
     <section id="contact" class="section contact-section section-bg"><div class="container"><h2 class="section-title text-center">Contacto</h2><div class="contact-grid"><div class="contact-info"><h3>Detalles</h3>{%if data.contact_email%}<p><i class="fas fa-envelope fa-fw contact-icon"></i> <a href="mailto:{{data.contact_email}}">{{data.contact_email}}</a></p>{%endif%}{%if data.contact_phone%}<p><i class="fas fa-phone fa-fw contact-icon"></i> {{data.contact_phone}}</p>{%endif%}{%if data.social_links_raw and data.social_links_raw.strip()%}<h3 class="social-title">Síguenos</h3><ul class="social-links-list">{%for l in data.social_links_raw.splitlines()%}{%set cl=l.strip()%}{%if cl%}{%set pi='fa-link'%}{%set bp='fas'%}{%if'linkedin.com'in cl%}{%set pi='fa-linkedin'%}{%set bp='fab'%}{%elif'twitter.com'in cl or'x.com'in cl%}{%set pi='fa-x-twitter'%}{%set bp='fab'%}{%elif'github.com'in cl%}{%set pi='fa-github'%}{%set bp='fab'%}{%elif'instagram.com'in cl%}{%set pi='fa-instagram'%}{%set bp='fab'%}{%elif'facebook.com'in cl%}{%set pi='fa-facebook'%}{%set bp='fab'%}{%elif'youtube.com'in cl%}{%set pi='fa-youtube'%}{%set bp='fab'%}{%elif'behance.net'in cl%}{%set pi='fa-behance'%}{%set bp='fab'%}{%elif'dribbble.com'in cl%}{%set pi='fa-dribbble'%}{%set bp='fab'%}{%elif'tiktok.com'in cl%}{%set pi='fa-tiktok'%}{%set bp='fab'%}{%elif'pinterest.com'in cl%}{%set pi='fa-pinterest'%}{%set bp='fab'%}{%endif%}<li><a href="{{cl}}" target="_blank" rel="noopener noreferrer" aria-label="{{pi|replace('fa-','')|capitalize}}" title="{{pi|replace('fa-','')|capitalize}}"><i class="{{bp}} {{pi}} social-icon"></i></a></li>{%endif%}{%endfor%}</ul>{%endif%}</div>
                  <div class="contact-message">
-                     <!-- ***** TEXTO CAMBIADO AQUÍ ***** -->
+                     <!-- ***** TEXTO CORREGIDO AQUÍ ***** -->
                      <h3>Envíanos un mensaje</h3>
-                     <p>Contacta usando la información proporcionada.</p>  
-                     <!-- ***** FIN TEXTO CAMBIADO ***** -->
+                     <p>Contacta usando la información proporcionada.</p>
+                     <!-- ***** FIN TEXTO CORREGIDO ***** -->
                  </div>
             </div></div>
     </section>
