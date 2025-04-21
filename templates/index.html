@@ -6,10 +6,7 @@
     <title>Impulsa Landing - Generador Inteligente</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" integrity="sha512-iecdLmaskl7CVkqkXNQ/ZH/XLlvWZOJyj7Yy7tcenmpD1ypASozpmT/E0iPtmFIB46ZmdtAc9eNBvH0H/ZpiBw==" crossorigin="anonymous" referrerpolicy="no-referrer" />
-    <style>
-        /* Estilos loader AI & botones */
-        .ai-loader{display:none;margin-left:10px;font-size:.9em;color:var(--primary-color);vertical-align:middle}.ai-loader i{animation:fa-spin 1.5s infinite linear}.ai-button{margin-top:-2px;margin-left:10px;font-size:.85em!important;padding:.3rem .7rem!important;vertical-align:middle;line-height:1.4}form label{display:inline-block}form .form-group>textarea,form .form-group>input:not([type=color]),form .form-group>select{display:block;width:100%;margin-top:var(--spacing-sm)}
-    </style>
+    <style> /* Estilos loader AI */ .ai-loader{display:none;margin-left:10px;font-size:.9em;color:var(--primary-color);vertical-align:middle}.ai-loader i{animation:fa-spin 1.5s infinite linear}.ai-button{margin-top:-2px;margin-left:10px;font-size:.85em!important;padding:.3rem .7rem!important;vertical-align:middle;line-height:1.4}form label{display:inline-block}form .form-group>textarea,form .form-group>input:not([type=color]),form .form-group>select{display:block;width:100%;margin-top:var(--spacing-sm)}</style>
 </head>
 <body>
     <div class="container form-container">
@@ -18,169 +15,48 @@
             <p>Rellena los campos (¡recordaremos tu última sesión!) para generar tu página.</p>
         </header>
 
-        <!-- form_data contiene los datos de la última sesión -->
         <form method="POST" action="/">
-
-            <fieldset>
-                <legend><i class="fas fa-info-circle"></i> Información Básica</legend>
-                <div class="form-group">
-                    <label for="page_type">1. Tipo de Página:</label>
-                    <select id="page_type" name="page_type" required>
-                        <option value="personal" {% if form_data.get('page_type') == 'personal' %}selected{% endif %}>👤 Personal</option>
-                        <option value="empresarial" {% if form_data.get('page_type', 'empresarial') == 'empresarial' %}selected{% endif %}>🏢 Empresarial</option>
-                    </select>
-                </div>
-                <div class="form-group">
-                    <label for="name">2. Nombre:</label>
-                    <input type="text" id="name" name="name" placeholder="Ej: Ana García / Soluciones Tech" required value="{{ form_data.get('name', '') }}">
-                </div>
-            </fieldset>
-
-            <fieldset>
-                 <legend><i class="fas fa-bullhorn"></i> Mensaje Principal</legend>
-                 <div class="form-group">
-                    <label for="headline">3. Titular Principal:</label>
-                    <input type="text" id="headline" name="headline" placeholder="Ej: Diseño webs que convierten" required maxlength="120" value="{{ form_data.get('headline', '') }}">
-                    <small>El gancho principal.</small>
-                </div>
-                <div class="form-group">
-                    <label for="description">4. Descripción:</label>
-                    <textarea id="description" name="description" rows="4" placeholder="Explica qué ofreces...">{{ form_data.get('description', '') }}</textarea>
-                </div>
-                 <div class="form-group">
-                    <label for="cta_text">5. Texto del Botón (CTA):</label>
-                    <input type="text" id="cta_text" name="cta_text" placeholder="Ej: Regístrate Gratis" required value="{{ form_data.get('cta_text', '') }}">
-                    <small>La acción principal.</small>
-                </div>
-            </fieldset>
-
-            <fieldset>
-                 <legend><i class="fas fa-star"></i> Características <span class="optional">(Opcional)</span></legend>
-                 <div class="form-group">
-                    <label for="features">6. Lista de Características:</label>
-                    <button type="button" class="btn btn-secondary btn-sm ai-button" id="fill-features-ai" title="Rellenar con Inteligencia Artificial"><i class="fas fa-magic"></i> IA</button>
-                    <span class="ai-loader" id="loader-features"><i class="fas fa-spinner"></i></span>
-                    <textarea id="features" name="features" rows="5" placeholder="icono:Título:Descripción (uno por línea)">{{ form_data.get('features_raw', '') }}</textarea>
-                    <small>Iconos de <a href='https://fontawesome.com/search?m=free&o=r' target='_blank' rel="noopener">Font Awesome</a>.</small>
-                 </div>
-            </fieldset>
-
-            <fieldset>
-                 <legend><i class="fas fa-concierge-bell"></i> Servicios <span class="optional">(Opcional)</span></legend>
-                 <div class="form-group">
-                    <label for="services">7. Lista de Servicios:</label>
-                    <button type="button" class="btn btn-secondary btn-sm ai-button" id="fill-services-ai" title="Rellenar con Inteligencia Artificial"><i class="fas fa-magic"></i> IA</button>
-                    <span class="ai-loader" id="loader-services"><i class="fas fa-spinner"></i></span>
-                    <textarea id="services" name="services" rows="5" placeholder="icono:Título del Servicio:Descripción breve (uno por línea)">{{ form_data.get('services_raw', '') }}</textarea>
-                    <small>Describe los servicios principales que ofreces. Usa iconos relevantes.</small>
-                 </div>
-            </fieldset>
-
-            <fieldset>
-                 <legend><i class="fas fa-comments"></i> Testimonios <span class="optional">(Opcional)</span></legend>
-                 <div class="form-group">
-                    <label for="testimonials">8. Testimonios:</label>
-                    <button type="button" class="btn btn-secondary btn-sm ai-button" id="fill-testimonials-ai" title="Rellenar con Inteligencia Artificial"><i class="fas fa-magic"></i> IA</button>
-                    <span class="ai-loader" id="loader-testimonials"><i class="fas fa-spinner"></i></span>
-                    <textarea id="testimonials" name="testimonials" rows="5" placeholder='"Cita." - Nombre, Cargo (uno por línea)'>{{ form_data.get('testimonials_raw', '') }}</textarea>
-                    <small>Generados por IA son ficticios.</small>
-                 </div>
-            </fieldset>
-
-            <fieldset>
-                 <legend><i class="fas fa-briefcase"></i> Portafolio <span class="optional">(Opcional)</span></legend>
-                 <div class="form-group">
-                    <label for="portfolio_items">9. Proyectos del Portafolio:</label>
-                    <textarea id="portfolio_items" name="portfolio_items" rows="6" placeholder="URL_Imagen | Título | Descripción | URL_Enlace (opcional)
-Un proyecto por línea.">{{ form_data.get('portfolio_raw', '') }}</textarea>
-                    <small>Usa URLs públicas para las imágenes. Separa campos con `|`.</small>
-                 </div>
-            </fieldset>
+            <fieldset> <legend><i class="fas fa-info-circle"></i> Información Básica</legend> <div class="form-group"> <label for="page_type">1. Tipo:</label> <select id="page_type" name="page_type" required> <option value="personal" {% if form_data.get('page_type') == 'personal' %}selected{% endif %}>👤 Personal</option> <option value="empresarial" {% if form_data.get('page_type', 'empresarial') == 'empresarial' %}selected{% endif %}>🏢 Empresarial</option> </select> </div> <div class="form-group"> <label for="name">2. Nombre:</label> <input type="text" id="name" name="name" placeholder="Ej: Ana García / Soluciones Tech" required value="{{ form_data.get('name', '') }}"> </div> </fieldset>
+            <fieldset> <legend><i class="fas fa-bullhorn"></i> Mensaje Principal</legend> <div class="form-group"> <label for="headline">3. Titular:</label> <input type="text" id="headline" name="headline" placeholder="Ej: Diseño webs que convierten" required maxlength="120" value="{{ form_data.get('headline', '') }}"> <small>El gancho principal.</small> </div> <div class="form-group"> <label for="description">4. Descripción:</label> <textarea id="description" name="description" rows="4" placeholder="Explica qué ofreces...">{{ form_data.get('description', '') }}</textarea> </div> <div class="form-group"> <label for="cta_text">5. Botón (CTA):</label> <input type="text" id="cta_text" name="cta_text" placeholder="Ej: Regístrate Gratis" required value="{{ form_data.get('cta_text', '') }}"> <small>La acción principal.</small> </div> </fieldset>
+            <fieldset> <legend><i class="fas fa-star"></i> Características <span class="optional">(Opcional)</span></legend> <div class="form-group"> <label for="features">6. Características:</label> <button type="button" class="btn btn-secondary btn-sm ai-button" id="fill-features-ai" title="Rellenar con IA"><i class="fas fa-magic"></i> IA</button> <span class="ai-loader" id="loader-features"><i class="fas fa-spinner"></i></span> <textarea id="features" name="features" rows="5" placeholder="icono:Título:Descripción (uno por línea)">{{ form_data.get('features_raw', '') }}</textarea> <small>Iconos de <a href='https://fontawesome.com/search?m=free&o=r' target='_blank' rel="noopener">Font Awesome</a>.</small> </div> </fieldset>
+            <fieldset> <legend><i class="fas fa-concierge-bell"></i> Servicios <span class="optional">(Opcional)</span></legend> <div class="form-group"> <label for="services">7. Servicios:</label> <button type="button" class="btn btn-secondary btn-sm ai-button" id="fill-services-ai" title="Rellenar con IA"><i class="fas fa-magic"></i> IA</button> <span class="ai-loader" id="loader-services"><i class="fas fa-spinner"></i></span> <textarea id="services" name="services" rows="5" placeholder="icono:Título:Descripción (uno por línea)">{{ form_data.get('services_raw', '') }}</textarea> <small>Describe los servicios principales.</small> </div> </fieldset>
+            <fieldset> <legend><i class="fas fa-comments"></i> Testimonios <span class="optional">(Opcional)</span></legend> <div class="form-group"> <label for="testimonials">8. Testimonios:</label> <button type="button" class="btn btn-secondary btn-sm ai-button" id="fill-testimonials-ai" title="Rellenar con IA"><i class="fas fa-magic"></i> IA</button> <span class="ai-loader" id="loader-testimonials"><i class="fas fa-spinner"></i></span> <textarea id="testimonials" name="testimonials" rows="5" placeholder='"Cita." - Nombre, Cargo (uno por línea)'>{{ form_data.get('testimonials_raw', '') }}</textarea> <small>Generados por IA son ficticios.</small> </div> </fieldset>
+            <fieldset> <legend><i class="fas fa-briefcase"></i> Portafolio <span class="optional">(Opcional)</span></legend> <div class="form-group"> <label for="portfolio_items">9. Portafolio:</label> <textarea id="portfolio_items" name="portfolio_items" rows="6" placeholder="URL_Imagen | Título | Descripción | URL_Enlace (opcional)
+Un proyecto por línea.">{{ form_data.get('portfolio_raw', '') }}</textarea> <small>Usa URLs públicas para las imágenes. Separa campos con `|`.</small> </div> </fieldset>
 
             <fieldset>
                  <legend><i class="fas fa-palette"></i> Diseño y Contacto</legend>
-                 <div class="form-group">
-                    <label for="logo_style">10. Estilo del Logo:</label>
-                    <select id="logo_style" name="logo_style">
-                        <option value="text" {% if form_data.get('logo_style', 'text') == 'text' %}selected{% endif %}>Texto</option>
-                        <option value="initials" {% if form_data.get('logo_style') == 'initials' %}selected{% endif %}>Iniciales</option>
-                    </select>
-                 </div>
-                 <div class="form-group">
-                    <label for="logo_shape">Forma Logo:</label>
-                    <select id="logo_shape" name="logo_shape">
-                        <option value="none" {% if form_data.get('logo_shape', 'none') == 'none' %}selected{% endif %}>Sin fondo</option>
-                        <option value="circle" {% if form_data.get('logo_shape') == 'circle' %}selected{% endif %}>Círculo</option>
-                        <option value="square" {% if form_data.get('logo_shape') == 'square' %}selected{% endif %}>Cuadrado</option>
-                    </select>
-                    <small>Texto usa color secundario si hay fondo.</small>
-                 </div>
-                 <div class="form-group">
-                    <label for="hero_background_type">11. Fondo Hero:</label>
-                    <select id="hero_background_type" name="hero_background_type">
-                        <option value="color" {% if form_data.get('hero_background_type', 'color') == 'color' %}selected{% endif %}>Color Primario</option>
-                        <option value="gradient" {% if form_data.get('hero_background_type') == 'gradient' %}selected{% endif %}>Gradiente</option>
-                        <option value="pattern" {% if form_data.get('hero_background_type') == 'pattern' %}selected{% endif %}>Patrón SVG</option>
-                        <option value="image_url" {% if form_data.get('hero_background_type') == 'image_url' %}selected{% endif %}>Imagen URL</option>
-                    </select>
-                 </div>
-                 <div class="form-group" id="hero_pattern_options" style="display: none;">
-                    <label for="hero_pattern_style">Estilo Patrón:</label>
-                    <select id="hero_pattern_style" name="hero_pattern_style">
-                        <option value="waves" {% if form_data.get('hero_pattern_style', 'waves') == 'waves' %}selected{% endif %}>Ondas</option>
-                        <option value="dots" {% if form_data.get('hero_pattern_style') == 'dots' %}selected{% endif %}>Puntos</option>
-                        <option value="lines" {% if form_data.get('hero_pattern_style') == 'lines' %}selected{% endif %}>Líneas</option>
-                        <option value="triangles" {% if form_data.get('hero_pattern_style') == 'triangles' %}selected{% endif %}>Triángulos</option>
-                    </select>
-                 </div>
+                 <div class="form-group"> <label for="logo_style">10. Estilo Logo:</label> <select id="logo_style" name="logo_style"> <option value="text" {% if form_data.get('logo_style', 'text') == 'text' %}selected{% endif %}>Texto</option> <option value="initials" {% if form_data.get('logo_style') == 'initials' %}selected{% endif %}>Iniciales</option> </select> </div>
+                 <div class="form-group"> <label for="logo_shape">Forma Logo:</label> <select id="logo_shape" name="logo_shape"> <option value="none" {% if form_data.get('logo_shape', 'none') == 'none' %}selected{% endif %}>Sin fondo</option> <option value="circle" {% if form_data.get('logo_shape') == 'circle' %}selected{% endif %}>Círculo</option> <option value="square" {% if form_data.get('logo_shape') == 'square' %}selected{% endif %}>Cuadrado</option> </select> <small>Texto usa color secundario si hay fondo.</small> </div>
+                 <div class="form-group"> <label for="hero_background_type">11. Fondo Sección Título:</label> <select id="hero_background_type" name="hero_background_type"> <option value="color" {% if form_data.get('hero_background_type', 'color') == 'color' %}selected{% endif %}>Color Primario</option> <option value="gradient" {% if form_data.get('hero_background_type') == 'gradient' %}selected{% endif %}>Gradiente</option> <option value="pattern" {% if form_data.get('hero_background_type') == 'pattern' %}selected{% endif %}>Patrón SVG</option> <option value="image_url">Usar Imagen junto al Título (Paso 11b)</option> {# Cambiado texto #} </select> <small>Elige cómo se verá el fondo de la sección del título principal.</small> </div>
+                 <div class="form-group" id="hero_pattern_options" style="display: none;"> <label for="hero_pattern_style">Estilo Patrón:</label> <select id="hero_pattern_style" name="hero_pattern_style"> <option value="waves" {% if form_data.get('hero_pattern_style', 'waves') == 'waves' %}selected{% endif %}>Ondas</option> <option value="dots" {% if form_data.get('hero_pattern_style') == 'dots' %}selected{% endif %}>Puntos</option> <option value="lines" {% if form_data.get('hero_pattern_style') == 'lines' %}selected{% endif %}>Líneas</option> <option value="triangles" {% if form_data.get('hero_pattern_style') == 'triangles' %}selected{% endif %}>Triángulos</option> </select> </div>
+                 <!-- CAMBIO Label/Small Text -->
                  <div class="form-group" id="hero_image_url_option" style="display: none;">
-                    <label for="image_hero_url">URL Imagen Hero:</label>
-                    <input type="url" id="image_hero_url" name="image_hero_url" placeholder="https://ejemplo.com/imagen.jpg" value="{{ form_data.get('image_hero_url', '') }}">
+                    <label for="image_hero_url">11b. URL Imagen junto al Título:</label>
+                    <input type="url" id="image_hero_url" name="image_hero_url" placeholder="https://ejemplo.com/imagen-titulo.jpg" value="{{ form_data.get('image_hero_url', '') }}">
+                    <small>Pega aquí la URL de la imagen que aparecerá al lado del título principal.</small>
                  </div>
-                 <div class="form-group color-picker-group">
-                    <label for="color_primary">12. Color Principal:</label>
-                    <input type="color" id="color_primary" name="color_primary" value="{{ form_data.get('color_primary', '#007bff') }}">
-                    <small>Botones, etc.</small>
-                 </div>
-                 <div class="form-group color-picker-group">
-                    <label for="color_secondary">13. Color Secundario:</label>
-                    <input type="color" id="color_secondary" name="color_secondary" value="{{ form_data.get('color_secondary', '#ffffff') }}">
-                    <small>Texto/acentos.</small>
-                 </div>
-                 <div class="form-group">
-                    <label for="contact_email">14. Email Contacto:</label>
-                    <input type="email" id="contact_email" name="contact_email" placeholder="tu@email.com" required value="{{ form_data.get('contact_email', '') }}">
-                 </div>
-                 <div class="form-group">
-                    <label for="contact_phone">15. Teléfono: <span class="optional">(Opcional)</span></label>
-                    <input type="tel" id="contact_phone" name="contact_phone" placeholder="+XX XXX XXX XXX" value="{{ form_data.get('contact_phone', '') }}">
-                 </div>
-                 <div class="form-group">
-                    <label for="social_links">16. Redes Sociales: <span class="optional">(Opcional)</span></label>
-                    <textarea id="social_links" name="social_links" rows="3" placeholder="URL por línea">{{ form_data.get('social_links_raw', '') }}</textarea>
-                 </div>
+                 <!-- FIN CAMBIO -->
+                 <div class="form-group color-picker-group"> <label for="color_primary">12. Color Principal:</label> <input type="color" id="color_primary" name="color_primary" value="{{ form_data.get('color_primary', '#007bff') }}"> <small>Botones, etc.</small> </div>
+                 <div class="form-group color-picker-group"> <label for="color_secondary">13. Color Secundario:</label> <input type="color" id="color_secondary" name="color_secondary" value="{{ form_data.get('color_secondary', '#ffffff') }}"> <small>Texto/acentos.</small> </div>
+                 <div class="form-group"> <label for="contact_email">14. Email Contacto:</label> <input type="email" id="contact_email" name="contact_email" placeholder="tu@email.com" required value="{{ form_data.get('contact_email', '') }}"> </div>
+                 <div class="form-group"> <label for="contact_phone">15. Teléfono: <span class="optional">(Opcional)</span></label> <input type="tel" id="contact_phone" name="contact_phone" placeholder="+XX XXX XXX XXX" value="{{ form_data.get('contact_phone', '') }}"> </div>
+                 <div class="form-group"> <label for="social_links">16. Redes Sociales: <span class="optional">(Opcional)</span></label> <textarea id="social_links" name="social_links" rows="3" placeholder="URL por línea">{{ form_data.get('social_links_raw', '') }}</textarea> </div>
             </fieldset>
 
-            <button type="submit" class="btn btn-primary btn-submit"><i class="fas fa-wand-magic-sparkles"></i> Generar Landing Page Elegante</button>
+            <button type="submit" class="btn btn-primary btn-submit"><i class="fas fa-wand-magic-sparkles"></i> Generar Landing Page</button>
         </form>
 
-        <footer class="form-footer">
-            <p>© {{ current_year }} Impulsa Landing (Demo).</p>
-        </footer>
-    </div> <!-- /container -->
+        <footer class="form-footer"> <p>© {{ current_year }} Impulsa Landing (Demo).</p> </footer>
+    </div>
 
-    <!-- Script JS (con listener para Servicios) -->
     <script>
         const bgTypeSelect=document.getElementById('hero_background_type');const patternOptions=document.getElementById('hero_pattern_options');const imageUrlOption=document.getElementById('hero_image_url_option');function toggleHeroOptions(){const t=bgTypeSelect.value;patternOptions.style.display=t==='pattern'?'block':'none';imageUrlOption.style.display=t==='image_url'?'block':'none';}bgTypeSelect.addEventListener('change',toggleHeroOptions);toggleHeroOptions();
-        const headlineInput=document.getElementById('headline');const descriptionInput=document.getElementById('description');
-        const featuresTextarea=document.getElementById('features');const fillFeaturesBtn=document.getElementById('fill-features-ai');const loaderFeatures=document.getElementById('loader-features');
-        const servicesTextarea=document.getElementById('services');const fillServicesBtn=document.getElementById('fill-services-ai');const loaderServices=document.getElementById('loader-services');
-        const testimonialsTextarea=document.getElementById('testimonials');const fillTestimonialsBtn=document.getElementById('fill-testimonials-ai');const loaderTestimonials=document.getElementById('loader-testimonials');
+        const headlineInput=document.getElementById('headline');const descriptionInput=document.getElementById('description'); const featuresTextarea=document.getElementById('features');const fillFeaturesBtn=document.getElementById('fill-features-ai');const loaderFeatures=document.getElementById('loader-features'); const servicesTextarea=document.getElementById('services');const fillServicesBtn=document.getElementById('fill-services-ai');const loaderServices=document.getElementById('loader-services'); const testimonialsTextarea=document.getElementById('testimonials');const fillTestimonialsBtn=document.getElementById('fill-testimonials-ai');const loaderTestimonials=document.getElementById('loader-testimonials');
         async function callAI(fieldType,btn,loader,textarea){const h=headlineInput.value.trim();const d=descriptionInput.value.trim();if(!h||!d){alert('Introduce Título y Descripción para usar IA.');return;}loader.style.display='inline-block';btn.disabled=true;try{const r=await fetch("{{url_for('generate_ai_content')}}",{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({headline:h,description:d,field_type:fieldType})});const result=await r.json();if(r.ok){textarea.value=result.generated_content||'';}else{console.error("Error API:",result.error);alert(`Error IA: ${result.error||'Error desconocido'}`);}}catch(e){console.error('Fetch Error:',e);alert('Error de conexión al intentar generar contenido.');}finally{loader.style.display='none';btn.disabled=false;}}
         if(fillFeaturesBtn)fillFeaturesBtn.addEventListener('click',()=>callAI('features',fillFeaturesBtn,loaderFeatures,featuresTextarea));
-        if(fillServicesBtn)fillServicesBtn.addEventListener('click',()=>callAI('services',fillServicesBtn,loaderServices,servicesTextarea)); // Listener Servicios
+        if(fillServicesBtn)fillServicesBtn.addEventListener('click',()=>callAI('services',fillServicesBtn,loaderServices,servicesTextarea));
         if(fillTestimonialsBtn)fillTestimonialsBtn.addEventListener('click',()=>callAI('testimonials',fillTestimonialsBtn,loaderTestimonials,testimonialsTextarea));
     </script>
-
 </body>
 </html>
